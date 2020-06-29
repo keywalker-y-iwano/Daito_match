@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kw-daito-identity
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: python-quota
+  namespace: kw-daito-identity
+spec:
+  hard:
+    requests.cpu: 2
+    requests.memory: 100Mi
+    limits.cpu: 2
+    limits.memory: 100Mi
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: python-cronjob
+  namespace:  kw-daito-identity
+spec:
+  schedule: '* 5 * * 2'
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: python-pod
+              image: 'gcr.io/databank-196105/kw-daito:latest'
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 100Mi
+                limits:
+                  cpu: 100m
+                  memory: 200Mi
+              command:
+                - python
+                - kw-Daito_matching.py
+          restartPolicy: OnFailure
