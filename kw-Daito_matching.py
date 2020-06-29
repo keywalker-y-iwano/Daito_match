@@ -230,7 +230,7 @@ try:
          store_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
      with sftp_connection.open("/home/y_iwano/pair_kisyu.csv", "r") as f:
          model_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
- finally:
+finally:
      client.close()
 # =============================================================================
 
