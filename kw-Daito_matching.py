@@ -210,7 +210,7 @@ client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 #finally:
 #    client.close()
 # =============================================================================
- try:
+try:
      # SFTPセッション開始
      client.connect(HOST, PORT, USER, pkey=rsa_key) # キーを指定することでパスワードは必要なし
      sftp_connection = client.open_sftp()
