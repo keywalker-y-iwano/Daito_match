@@ -1,5 +1,5 @@
-
 # -*- coding: utf-8 -*-
+print('=========================start========================')
 import datetime
 import pandas as pd
 import paramiko
@@ -145,13 +145,11 @@ def read_csv(self, filepath, index_col=None):
     return df
 
 
-print('=========================start========================')
 dat = datetime.datetime.now()
 date = dat.strftime('%Y/%m/%d')
 dir_date = dat.strftime('%Y%m%d')
 dir_date = dir_date[2:8]
 
-# =============================================================================
 # print('==================Connect:test_data===================')
 # 
 
@@ -175,9 +173,7 @@ dir_date = dir_date[2:8]
 # model_pair_array = pd.read_csv(model_pair_array_path, encoding="utf-8_sig",dtype=object)
 # =============================================================================
 
-
-# print('=====================Connect:GCP======================')
-
+print('=====================Connect:GCP======================')
 # SFTP接続先の設定
 HOST = '104.198.89.41'
 PORT = 'ssh'
@@ -188,44 +184,21 @@ rsa_key = paramiko.RSAKey.from_private_key_file(KEY_FILE)
 client = paramiko.SSHClient()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-# try:
-#     # SFTPセッション開始
-#     client.connect(HOST, PORT, USER, pkey=rsa_key) # キーを指定することでパスワードは必要なし
-#     sftp_connection = client.open_sftp()
-#     with sftp_connection.open("/home/crawler/file/p-world_kisyu.csv", "r") as f:
-#         PW_model_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#     with sftp_connection.open("/home/crawler/file/p-world_dai.csv", "r") as f:
-#         PW_table_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#     with sftp_connection.open("/home/crawler/file/p-world_tenpo.csv", "r") as f:
-#         PW_store_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#     with sftp_connection.open("/home/crawler/file/dmm_kisyu.csv", "r") as f:
-#         DM_model_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#     with sftp_connection.open("/home/crawler/file/dmm_dai.csv", "r") as f:
-#         DM_table_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#     with sftp_connection.open("/home/crawler/file/dmm_tenpo.csv", "r") as f:
-#         DM_store_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#     with sftp_connection.open("/home/y_iwano/pair_tenpo.csv", "r") as f:
-#         store_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#     with sftp_connection.open("/home/y_iwano/pair_kisyu.csv", "r") as f:
-#         model_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-# finally:
-#     client.close()
-
 try:
-    # SFTPセッション開始テスト環境
+    # SFTPセッション開始
     client.connect(HOST, PORT, USER, pkey=rsa_key) # キーを指定することでパスワードは必要なし
     sftp_connection = client.open_sftp()
-    with sftp_connection.open("/home/y_iwano/p-world_kisyu.csv", "r") as f:
+    with sftp_connection.open("/home/crawler/file/p-world_kisyu.csv", "r") as f:
         PW_model_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-    with sftp_connection.open("/home/y_iwano/p-world_dai.csv", "r") as f:
+    with sftp_connection.open("/home/crawler/file/p-world_dai.csv", "r") as f:
         PW_table_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-    with sftp_connection.open("/home/y_iwano/p-world_tenpo.csv", "r") as f:
+    with sftp_connection.open("/home/crawler/file/p-world_tenpo.csv", "r") as f:
         PW_store_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-    with sftp_connection.open("/home/y_iwano/dmm_kisyu.csv", "r") as f:
+    with sftp_connection.open("/home/crawler/file/dmm_kisyu.csv", "r") as f:
         DM_model_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-    with sftp_connection.open("/home/y_iwano/dmm_dai.csv", "r") as f:
+    with sftp_connection.open("/home/crawler/file/dmm_dai.csv", "r") as f:
         DM_table_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-    with sftp_connection.open("/home/y_iwano/dmm_tenpo.csv", "r") as f:
+    with sftp_connection.open("/home/crawler/file/dmm_tenpo.csv", "r") as f:
         DM_store_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
     with sftp_connection.open("/home/y_iwano/pair_tenpo.csv", "r") as f:
         store_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
@@ -234,56 +207,28 @@ try:
 finally:
     client.close()
 
-=======
-#try:
-#    # SFTPセッション開始
-#    client.connect(HOST, PORT, USER, pkey=rsa_key) # キーを指定することでパスワードは必要なし
-#    sftp_connection = client.open_sftp()
-#    with sftp_connection.open("/home/crawler/file/p-world_kisyu.csv", "r") as f:
-#        PW_model_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#    with sftp_connection.open("/home/crawler/file/p-world_dai.csv", "r") as f:
-#        PW_table_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#    with sftp_connection.open("/home/crawler/file/p-world_tenpo.csv", "r") as f:
-#        PW_store_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#    with sftp_connection.open("/home/crawler/file/dmm_kisyu.csv", "r") as f:
-#        DM_model_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#    with sftp_connection.open("/home/crawler/file/dmm_dai.csv", "r") as f:
-#        DM_table_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#    with sftp_connection.open("/home/crawler/file/dmm_tenpo.csv", "r") as f:
-#        DM_store_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#    with sftp_connection.open("/home/y_iwano/pair_tenpo.csv", "r") as f:
-#        store_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#    with sftp_connection.open("/home/y_iwano/pair_kisyu.csv", "r") as f:
-#        model_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-#finally:
-#    client.close()
-# =============================================================================
-try:
-     # SFTPセッション開始
-     client.connect(HOST, PORT, USER, pkey=rsa_key) # キーを指定することでパスワードは必要なし
-     sftp_connection = client.open_sftp()
-     with sftp_connection.open("/home/y_iwano/p-world_kisyu.csv", "r") as f:
-         PW_model_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-     with sftp_connection.open("/home/y_iwano/p-world_dai.csv", "r") as f:
-         PW_table_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-     with sftp_connection.open("/home/y_iwano/p-world_tenpo.csv", "r") as f:
-         PW_store_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-     with sftp_connection.open("/home/y_iwano/dmm_kisyu.csv", "r") as f:
-         DM_model_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-     with sftp_connection.open("/home/y_iwano/dmm_dai.csv", "r") as f:
-         DM_table_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-     with sftp_connection.open("/home/y_iwano/dmm_tenpo.csv", "r") as f:
-         DM_store_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-     with sftp_connection.open("/home/y_iwano/pair_tenpo.csv", "r") as f:
-         store_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-     with sftp_connection.open("/home/y_iwano/pair_kisyu.csv", "r") as f:
-         model_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-finally:
-     client.close()
-# =============================================================================
->>>>>>> d480f4a996b325649b483aee1fd7657d3c891cf6
-
-
+# try:
+#     SFTPセッション開始テスト環境
+#     client.connect(HOST, PORT, USER, pkey=rsa_key) # キーを指定することでパスワードは必要なし
+#     sftp_connection = client.open_sftp()
+#     with sftp_connection.open("/home/y_iwano/p-world_kisyu.csv", "r") as f:
+#         PW_model_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
+#     with sftp_connection.open("/home/y_iwano/p-world_dai.csv", "r") as f:
+#         PW_table_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
+#     with sftp_connection.open("/home/y_iwano/p-world_tenpo.csv", "r") as f:
+#         PW_store_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
+#     with sftp_connection.open("/home/y_iwano/dmm_kisyu.csv", "r") as f:
+#         DM_model_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
+#     with sftp_connection.open("/home/y_iwano/dmm_dai.csv", "r") as f:
+#         DM_table_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
+#     with sftp_connection.open("/home/y_iwano/dmm_tenpo.csv", "r") as f:
+#         DM_store_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
+#     with sftp_connection.open("/home/y_iwano/pair_tenpo.csv", "r") as f:
+#         store_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
+#     with sftp_connection.open("/home/y_iwano/pair_kisyu.csv", "r") as f:
+#         model_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
+# finally:
+#     client.close()
 
 print('=======================機種データ=======================')
 print('===============clensing : DM_model_array==============')
