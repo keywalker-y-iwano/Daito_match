@@ -701,7 +701,7 @@ output_tenpo_not_match_dm['dmm_t_code'] = DM_store_list_match['dmm_t_code']
 
 logging.info('==============Connect: Daito-Network==================')
 
-SFTP接続先の設定
+# SFTP接続先の設定
 HOST = 'sftp.daitogiken.com'
 PORT = 2022
 SFTP_USER = 'kwk-001'
