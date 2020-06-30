@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-print('=========================start========================')
 import datetime
 import pandas as pd
 import paramiko
@@ -7,7 +6,12 @@ import mojimoji as moji
 import string
 import re
 import csv
+import logging
 from decimal import Decimal, ROUND_HALF_UP
+
+logging.basicConfig(level=logging.DEBUG)
+logging.info('=========================start========================')
+print('=========================start========================')
 
 def sprit_dai_p(s):
     str_s = str(s)
@@ -173,7 +177,8 @@ dir_date = dir_date[2:8]
 # model_pair_array = pd.read_csv(model_pair_array_path, encoding="utf-8_sig",dtype=object)
 # =============================================================================
 
-print('=====================Connect:GCP======================')
+logging.info('=====================Connect:GCP======================')
+
 # SFTP接続先の設定
 HOST = '104.198.89.41'
 PORT = 'ssh'
