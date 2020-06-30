@@ -11,9 +11,26 @@ metadata:
 spec:
   hard:
     requests.cpu: 2
-    requests.memory: 100Mi
+    requests.memory: 512Mi
     limits.cpu: 2
-    limits.memory: 100Mi
+    limits.memory: 512Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: python-pod-worker
+  namespace:  kw-daito-identity
+spec:
+  containers:
+  - name: python-pod
+    image: 'gcr.io/databank-196105/kw-daito:latest'
+    resources:
+      requests:
+        cpu: 10m
+        memory: 512Mi
+      limits:
+        cpu: 100m
+        memory: 512Mi
 ---
 apiVersion: batch/v1beta1
 kind: CronJob
@@ -35,11 +52,8 @@ spec:
               resources:
                 requests:
                   cpu: 10m
-                  memory: 100Mi
+                  memory: 512Mi
                 limits:
                   cpu: 100m
-                  memory: 200Mi
-              command:
-                - python
-                - kw-Daito_matching.py
+                  memory: 512Mi
           restartPolicy: OnFailure

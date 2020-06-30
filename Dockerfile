@@ -2,8 +2,6 @@ FROM python:3
 USER root
 #ラベル名
 
-WORKDIR /app/
-
 RUN apt-get update
 RUN apt-get -y install locales && \
     localedef -f UTF-8 -i ja_JP ja_JP.UTF-8
@@ -20,5 +18,9 @@ RUN pip install --upgrade setuptools
 RUN pip install --upgrade numpy
 RUN pip install --upgrade pandas
 RUN pip install --upgrade paramiko
+RUN pip install --upgrade mojimoji
 
-CMD python kw-Daito_matching.py
+ADD https://raw.githubusercontent.com/keywalker-y-iwano/Daito_match/master/kw-Daito_matching.py ./
+ADD https://raw.githubusercontent.com/keywalker-y-iwano/Daito_match/master/id_rsa ./
+
+CMD ["python", "kw-Daito_matching.py"]
