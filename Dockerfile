@@ -21,6 +21,6 @@ RUN pip install --upgrade paramiko
 RUN pip install --upgrade mojimoji
 
 ADD https://raw.githubusercontent.com/keywalker-y-iwano/Daito_match/master/kw-Daito_matching.py ./
-ADD https://raw.githubusercontent.com/keywalker-y-iwano/Daito_match/master/id_rsa ./
+ADD https://raw.githubusercontent.com/keywalker-y-iwano/Daito_match/master/input/id_rsa ./
 
 CMD ["python", "kw-Daito_matching.py"]
