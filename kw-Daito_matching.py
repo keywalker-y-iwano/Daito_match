@@ -9,9 +9,8 @@ import csv
 import logging
 from decimal import Decimal, ROUND_HALF_UP
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logging.info('=========================start========================')
-print('=========================start========================')
 
 def sprit_dai_p(s):
     str_s = str(s)
@@ -154,7 +153,7 @@ date = dat.strftime('%Y/%m/%d')
 dir_date = dat.strftime('%Y%m%d')
 dir_date = dir_date[2:8]
 
-# print('==================Connect:test_data===================')
+# logging.info('==================Connect:test_data===================')
 # 
 
 # 
@@ -235,8 +234,8 @@ finally:
 # finally:
 #     client.close()
 
-print('=======================機種データ=======================')
-print('===============clensing : DM_model_array==============')
+logging.info('=======================機種データ=======================')
+logging.info('===============clensing : DM_model_array==============')
 
 DM_model_array_clensing = DM_model_array.copy()
 DM_model_array_clensing['clensing_title'] = ''
@@ -258,7 +257,7 @@ DM_model_array_clensing['info1'] = DM_model_array_clensing['info1'].str.replace(
 DM_model_array_clensing['site'] = 1
 #DM_model_array_clensing = DM_model_array_clensing.drop_duplicates(subset=['clensing_title','P_S'])
 
-print('===============clensing : PW_model_array==============')
+logging.info('===============clensing : PW_model_array==============')
 
 PW_model_array_clensing = PW_model_array.copy()
 PW_model_array_clensing['clensing_title'] = ''
@@ -273,7 +272,7 @@ PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].str.replac
 PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].apply(add_zero)
 PW_model_array_clensing['site'] = 0
 
-print('===================check: model_list==================')
+logging.info('===================check: model_list==================')
 
 DM_model_array_merge = pd.merge(DM_model_array_clensing, model_pair_array, on='dmm_pcode', how='left')
 PW_model_array_merge = pd.merge(PW_model_array_clensing, model_pair_array, on='pw_pcode', how='left')
@@ -297,7 +296,7 @@ output_kisyu_p['更新日付'] = PW_model_array_merge_dropDM['s_date']
 output_kisyu_p['dmm_pcode'] = 'dmm_' + PW_model_array_merge_dropDM['dmm_pcode_y']
 
 
-print('===============duplicate : output_kisyu===============')
+logging.info('===============duplicate : output_kisyu===============')
 
 DM_model_duplicate = DM_model_array_merge[DM_model_array_merge['pw_pcode_y'].isnull()]
 PW_model_duplicate = PW_model_array_merge[PW_model_array_merge['dmm_pcode_y'].isnull()]
@@ -327,7 +326,7 @@ output_kisyu_to_csv = output_kisyu_to_csv.drop('clensing_title', axis=1)
 output_kisyu_to_csv = output_kisyu_to_csv.drop_duplicates(subset=['機種名','pcode'])
 #output_kisyu_to_csv.to_csv("c:/users/岩野 勇弥/desktop/【大都技研】/02.data/output/p_kisyu_○○.csv",encoding='utf_8_sig', index=False ,sep=',' , quotechar='"', quoting=csv.QUOTE_ALL)
 
-print('================output : output_kisyu_pair============')
+logging.info('================output : output_kisyu_pair============')
 
 model_output_array_inner = pd.merge(PW_model_duplicate, DM_model_duplicate, on='clensing_title', how='inner')
 model_output_pair_array = pd.DataFrame(columns=['dmm_pcode','pw_pcode'])
@@ -336,7 +335,7 @@ model_output_pair_array['dmm_pcode'] = model_output_array_inner['dmm_pcode']
 output_pair_to_csv = pd.concat([model_pair_array,model_output_pair_array])
 #output_pair_to_csv.to_csv("c:/users/岩野 勇弥/desktop/【大都技研】/02.data/output/pair_kisyu.csv",encoding='utf_8_sig', index=False)
 
-print('==========duplicate : output_kisyu_not_match==========')
+logging.info('==========duplicate : output_kisyu_not_match==========')
 
 output_kisyu_to_csv_temp['pcode'] = model_array_output['pw_pcode'].str.replace('p','')
 PW_model_not_match = output_kisyu_to_csv_temp[output_kisyu_to_csv_temp['dmm_pcode'].isnull()]
@@ -395,8 +394,8 @@ output_kisyu_not_match_DM['dmm_pcode'] = 'dmm_' + DM_model_not_match['dmm_pcode'
 
 
 
-print('=========================台データ=======================')
-print('================clensing : DM_table_array=============')
+logging.info('=========================台データ=======================')
+logging.info('================clensing : DM_table_array=============')
 
 DM_table_array_clensing = DM_table_array.copy()
 DM_table_array_clensing['clensing_title'] = ''
@@ -420,7 +419,7 @@ DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_ti
 DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].str.replace('‐','').str.replace('｢','').str.replace('｣','').str.replace('〜','').str.replace('【','').str.replace('】','').str.replace('☆','').str.replace('†','').str.replace('…','')
 DM_table_array_clensing['site'] = 1
 
-print('===============clensing : PW_table_array==============')
+logging.info('===============clensing : PW_table_array==============')
 
 PW_table_array_clensing = PW_table_array.copy()
 PW_table_array_clensing['clensing_title'] = ''
@@ -445,7 +444,7 @@ PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_ti
 PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.replace('‐','').str.replace('｢','').str.replace('｣','').str.replace('〜','').str.replace('【','').str.replace('】','').str.replace('☆','').str.replace('†','').str.replace('…','')
 PW_table_array_clensing['site'] = 0
 
-print('==================marge : table_array=================')
+logging.info('==================marge : table_array=================')
 
 table_array_innner = pd.merge(PW_table_array_clensing, DM_table_array_clensing, on=['clensing_title', 'rate', 'state_cd', 'p_code'], how='left')
 
@@ -478,8 +477,8 @@ output_dai_to_csv = output_dai_to_csv.loc[:, ['state_cd', 't_code', 'pcode', '�
 
 
 
-print('=======================店舗データ=======================')
-print('================clensing : DM_store_array=============')
+logging.info('=======================店舗データ=======================')
+logging.info('================clensing : DM_store_array=============')
 
 DM_store_array_clensing = DM_store_array.copy()
 DM_store_array_clensing['clensing_title'] = ''
@@ -518,7 +517,7 @@ DM_store_array_clensing['site'] = 1
 # =============================================================================
 
 
-print('================clensing : PW_store_array=============')
+logging.info('================clensing : PW_store_array=============')
 
 PW_store_array_clensing = PW_store_array.copy()
 PW_store_array_clensing['clensing_title'] = ''
@@ -549,7 +548,7 @@ PW_store_array_clensing = PW_store_array_clensing.drop_duplicates(subset=['clens
 PW_store_array_clensing['site'] = 0
 
 
-print('===================check: Store_list==================')
+logging.info('===================check: Store_list==================')
 
 store_pair_array = store_pair_array.rename(columns={'t_code':'pw_t_code'})
 store_pair_array = store_pair_array.drop_duplicates(subset='pw_t_code')
@@ -558,7 +557,7 @@ store_pair_array = store_pair_array.drop_duplicates(subset='dmm_t_code')
 PW_store_array_merge = pd.merge(PW_store_array_clensing, store_pair_array, on='pw_t_code', how='inner')
 PW_store_array_merged = PW_store_array_merge.dropna(subset=['dmm_t_code_y'])
 
-print('===============duplicate : output_kisyu===============')
+logging.info('===============duplicate : output_kisyu===============')
 
 output_tenpo_pp = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
 output_tenpo_pp['state_cd'] = PW_store_array_merged['state_cd'] 
@@ -719,7 +718,7 @@ output_tenpo_not_match_dm = pd.DataFrame(columns=['総務省コード', 'state_c
 
 pair_tenpo = pd.DataFrame(columns=['t_code', 'dmm_t_code'])
 
-print('==========duplicate : Output_Kisyu_Not_Match==========')
+logging.info('==========duplicate : Output_Kisyu_Not_Match==========')
 
 
 output_tenpo_not_match_pw = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
@@ -769,7 +768,7 @@ output_tenpo_not_match_dm['dmm_t_code'] = DM_store_list_match['dmm_t_code']
 #output_tenpo_not_match_dm.to_csv("C:/Users/岩野 勇弥/Desktop/【大都技研】/02.data/output/output_tenpo_not_matchDM.csv",encoding='utf_8_sig', index=False)
 
 
-print('==============Connect: Daito-Network==================')
+logging.info('==============Connect: Daito-Network==================')
 
 # SFTP接続先の設定
 HOST = 'sftp.daitogiken.com'
@@ -798,4 +797,4 @@ try:
 finally:
     client.close()
 
-print('==========================end=========================')
+logging.info('==========================end=========================')
