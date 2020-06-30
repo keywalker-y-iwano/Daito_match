@@ -180,9 +180,9 @@ try:
         DM_table_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
     with sftp_connection.open("/home/crawler/file/dmm_tenpo.csv", "r") as f:
         DM_store_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-    with sftp_connection.open("/home/y_iwano/pair_tenpo.csv", "r") as f:
+    with sftp_connection.open("/home/y_iwano/Daito/Pair_data/pair_tenpo.csv", "r") as f:
         store_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
-    with sftp_connection.open("/home/y_iwano/Daito/Pair_data/pair_kisyu.csv.csv", "r") as f:
+    with sftp_connection.open("/home/y_iwano/Daito/Pair_data/pair_kisyu.csv", "r") as f:
         model_pair_array = pd.read_csv(f, encoding="utf-8_sig",dtype=object)
 finally:
     client.close()

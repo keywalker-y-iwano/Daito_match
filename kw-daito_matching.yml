@@ -15,49 +15,52 @@ spec:
     limits.cpu: 2
     limits.memory: 3Gi
 ---
-apiVersion: batch/v1beta1
-kind: CronJob
-metadata:
-  name: python-pod-worker
-  namespace:  kw-daito-identity
-spec:
-  schedule: '* 5 * * 2'
-  containers:
-  - name: python-pod
-    image: 'gcr.io/databank-196105/kw-daito:latest'
-    resources:
-      requests:
-        cpu: 10m
-        memory: 1Gi
-      limits:
-        cpu: 100m
-        memory: 3Gi
-    command:
-      - python
-      - kw-Daito_matching.py
-# ---
 # apiVersion: batch/v1beta1
 # kind: CronJob
 # metadata:
-#   name: python-cronjob
+#   name: python-worker
 #   namespace:  kw-daito-identity
-# spec:
 #   schedule: '* 5 * * 2'
-#   concurrencyPolicy: Forbid
-#   successfulJobsHistoryLimit: 5
-#   failedJobsHistoryLimit: 5
-#   jobTemplate:
 #     spec:
-#       template:
-#         spec:
-#           containers:
-#             - name: python-pod
-#               image: 'gcr.io/databank-196105/kw-daito:latest'
-#               resources:
-#                 requests:
-#                   cpu: 10m
-#                   memory: 1Gi
-#                 limits:
-#                   cpu: 100m
-#                   memory: 3Gi
-#           restartPolicy: OnFailure
+#       containers:
+#       - name: python-pod
+#         image: 'gcr.io/databank-196105/kw-daito:latest'
+#         resources:
+#           requests:
+#             cpu: 10m
+#             memory: 1Gi
+#           limits:
+#             cpu: 100m
+#             memory: 3Gi
+#         command:
+#           - python
+#           - kw-Daito_matching.py
+# ---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: python-cronjob
+  namespace:  kw-daito-identity
+spec:
+  schedule: '* 5 * * 2'
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: python-pod
+              image: 'gcr.io/databank-196105/kw-daito:latest'
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 1Gi
+                limits:
+                  cpu: 100m
+                  memory: 3Gi
+              command:
+                - python
+                - kw-Daito_matching.py
+          restartPolicy: OnFailure
