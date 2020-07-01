@@ -713,16 +713,14 @@ client.connect(HOST, port=PORT, username=SFTP_USER, password=SFTP_PASSWORD)
 try:
     # SFTPセッション開始
     sftp_connection = client.open_sftp()
-    # フォルダ生成
-    sftp_connection.mkdir(dir_date)
     # ファイル出力
-    file_kisyu = sftp_connection.file(dir_date + '/p_kisyu_'+ dir_date +'.csv', "a", -1)
+    file_kisyu = sftp_connection.file('/p_kisyu_'+ dir_date +'.csv', "a", -1)
     file_kisyu.write("\uFEFF")
     file_kisyu.write(output_kisyu_to_csv.to_csv(index=False, encoding="utf-8"))
-    file_dai = sftp_connection.file(dir_date + '/p_dai_'+ dir_date +'.csv', "a", -1)
+    file_dai = sftp_connection.file('/p_dai_'+ dir_date +'.csv', "a", -1)
     file_dai.write("\uFEFF")
     file_dai.write(output_dai_to_csv.to_csv(index=False, encoding="utf-8"))
-    file_tempo = sftp_connection.file(dir_date + '/p_tenpo_'+ dir_date +'.csv', "a", -1)
+    file_tempo = sftp_connection.file('/p_tenpo_'+ dir_date +'.csv', "a", -1)
     file_tempo.write("\uFEFF")
     file_tempo.write(output_tenpo_to_csv.to_csv(index=False, encoding="utf-8"))
 finally:
@@ -743,16 +741,16 @@ try:
     client.connect(HOST, PORT, USER, pkey=rsa_key) # キーを指定することでパスワードは必要なし
     sftp_connection = client.open_sftp()
     # ファイル出力
-    file_kisyu1 = sftp_connection.file('/home/y_iwano/Daito/NMatch/' + dir_date + '/kisyu_PW_'+ dir_date +'.csv', "a", -1)
+    file_kisyu1 = sftp_connection.file('/home/y_iwano/Daito/NMatch/kisyu_PW_'+ dir_date +'.csv', "a", -1)
     file_kisyu1.write("\uFEFF")
     file_kisyu1.write(output_kisyu_not_match_PW.to_csv(index=False, encoding="utf-8"))
-    file_kisyu2 = sftp_connection.file('/home/y_iwano/Daito/NMatch/' + dir_date + '/NMatch/kisyu_DM_'+ dir_date +'.csv', "a", -1)
+    file_kisyu2 = sftp_connection.file('/home/y_iwano/Daito/NMatch/NMatch/kisyu_DM_'+ dir_date +'.csv', "a", -1)
     file_kisyu2.write("\uFEFF")
     file_kisyu2.write(output_kisyu_not_match_DM.to_csv(index=False, encoding="utf-8"))
-    file_tempo1 = sftp_connection.file('/home/y_iwano/Daito/NMatch/' + dir_date + '/NMatch/tenpo_DM_'+ dir_date +'.csv', "a", -1)
+    file_tempo1 = sftp_connection.file('/home/y_iwano/Daito/NMatch/NMatch/tenpo_DM_'+ dir_date +'.csv', "a", -1)
     file_tempo1.write("\uFEFF")
     file_tempo1.write(output_tenpo_not_match_pw.to_csv(index=False, encoding="utf-8"))
-    file_tempo2 = sftp_connection.file('/home/y_iwano/Daito/NMatch/' + dir_date + '/NMatch/tenpo_PW_'+ dir_date +'.csv', "a", -1)
+    file_tempo2 = sftp_connection.file('/home/y_iwano/Daito/NMatch/NMatch/tenpo_PW_'+ dir_date +'.csv', "a", -1)
     file_tempo2.write("\uFEFF")
     file_tempo2.write(output_tenpo_not_match_dm.to_csv(index=False, encoding="utf-8"))
     file_pair_kisyu = sftp_connection.file('/home/y_iwano/Daito/Pair_data/pair_kisyu.csv', "a", -1)
