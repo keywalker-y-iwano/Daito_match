@@ -16,7 +16,7 @@ spec:
     limits.memory: 3Gi
 ---
 # apiVersion: batch/v1beta1
-# kind: CronJob
+# kind: Pod
 # metadata:
 #   name: python-worker
 #   namespace:  kw-daito-identity
@@ -42,7 +42,7 @@ metadata:
   name: python-cronjob
   namespace:  kw-daito-identity
 spec:
-  schedule: '* 5 * * 2'
+  schedule: '* 6 * * 2'
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 5
   failedJobsHistoryLimit: 5
