@@ -19,7 +19,7 @@ RUN pip install --upgrade numpy
 RUN pip install --upgrade pandas
 RUN pip install --upgrade paramiko
 RUN pip install --upgrade mojimoji
-RUN pip install --requests
+RUN pip install --upgrade requests
 
 ADD https://raw.githubusercontent.com/keywalker-y-iwano/Daito_match/master/kw-Daito_matching.py ./
 ADD https://raw.githubusercontent.com/keywalker-y-iwano/Daito_match/master/input/id_rsa ./
