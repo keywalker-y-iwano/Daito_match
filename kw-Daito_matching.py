@@ -7,6 +7,7 @@ import string
 import re
 import csv
 import logging
+import requests
 from decimal import Decimal, ROUND_HALF_UP
 
 logging.basicConfig(level=logging.INFO)
