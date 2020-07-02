@@ -11,6 +11,14 @@ from decimal import Decimal, ROUND_HALF_UP
 
 logging.basicConfig(level=logging.INFO)
 logging.info('=========================start========================')
+def mail_gun(text):
+    files = {
+        'from': (None, 'y_iwano <mailgun@mg.keywalker.co.jp>'),
+        'to': (None, 'y_iwano@keywalker.co.jp,a_okada@keywalker.co.jp,k_yamashita@keywalker.co.jp'),
+        'subject': (None, '大都技研：名寄せ処理エラー'),
+        'text': (None, text),
+        }
+    response = requests.post('https://api.mailgun.net/v3/mg.keywalker.co.jp/messages', files=files, auth=('api', 'key-c81c485158951df1e152505f1b82e674'))
 
 def sprit_dai_p(s):
     str_s = str(s)
@@ -269,7 +277,7 @@ output_kisyu['情報1'] = 'レビュー件数'
 output_kisyu['内容1'] = model_array_output['info1_y']
 output_kisyu['情報2'] = 'レビュースコア'
 output_kisyu['内容2'] = model_array_output['info2_y']
-output_kisyu['導入年月'] = model_array_output['d_date_y']
+output_kisyu['導入年月'] = model_array_output['d_date_x']
 output_kisyu['更新日付'] = model_array_output['s_date_x']
 output_kisyu['dmm_pcode'] = 'dmm_' + model_array_output['dmm_pcode_y']
 
@@ -698,6 +706,100 @@ output_tenpo_not_match_dm['co_date'] = DM_store_list_match['co_date']
 output_tenpo_not_match_dm['merge_url'] = DM_store_list_match['url']
 output_tenpo_not_match_dm['tenpo_update'] = DM_store_list_match['tenpo_update']
 output_tenpo_not_match_dm['dmm_t_code'] = DM_store_list_match['dmm_t_code']
+
+logging.info('=================Check: Data-Check====================')
+
+KISYU_THRESHOLD = 9208
+DAI_THRESHOLD = 1727817
+TENPO_THRESHOLD = 12573
+
+kisyu_th_text = ''
+dai_th_text = ''
+tenpo_th_text = ''
+kisyu_pcode_text = ''
+kisyu_kisyu_text = ''
+kisyu_PS_text = ''
+dai_state_text = ''
+dai_kisyu_text = ''
+dai_pcode_text = ''
+tenpo_tcode_text = ''
+tenpo_hole_text = ''
+tenpo_address_texts = ''
+
+kisyu_rate = len(output_kisyu_to_csv) / KISYU_THRESHOLD
+dai_rate = len(output_dai_to_csv) / DAI_THRESHOLD
+tenpo_rate = len(output_tenpo_to_csv) / TENPO_THRESHOLD
+
+if kisyu_rate < 0.9:
+    kisyu_th_text = '機種データが' + str(100 *(1 - kisyu_rate)) + '%減少しました\n'
+if dai_rate < 0.9:
+    dai_th_text = '台データが' + str(100 *(1 - dai_rate)) + '%減少しました\n'
+if tenpo_rate < 0.9:
+    tenpo_th_text = '店舗データが' + str(100 *(1 - tenpo_rate)) + '%減少しました\n'
+
+kisyu_len = len(output_kisyu_to_csv)
+kisyu_check_temp = output_kisyu_to_csv.dropna(subset=['pcode'])
+kisyu_len_temp = len(kisyu_check_temp)
+if kisyu_len != kisyu_len_temp:
+    kisyu_pcode_text = '機種データ：pcodeに' + str(kisyu_len - kisyu_len_temp) + '個の欠損''があります\n'
+    kisyu_len = kisyu_len_temp
+
+kisyu_check_temp = kisyu_check_temp.dropna(subset=['機種名'])
+kisyu_len_temp = len(kisyu_check_temp)
+if kisyu_len != kisyu_len_temp:
+    kisyu_kisyu_text = '機種データ：機種名に' + str(kisyu_len - kisyu_len_temp) + '個の欠損があります\n'
+    kisyu_len = kisyu_len_temp
+
+kisyu_check_temp = kisyu_check_temp.dropna(subset=['Ｐ／Ｓ区分'])
+kisyu_len_temp = len(kisyu_check_temp)
+if kisyu_len != kisyu_len_temp:
+    kisyu_PS_text = '機種データ：Ｐ／Ｓ区分に' + str(kisyu_len - kisyu_len_temp) + '個の欠損があります\n'
+    kisyu_len = kisyu_len_temp
+
+
+dai_len = len(output_dai_to_csv)
+dai_check_temp = output_dai_to_csv.dropna(subset=['state_cd'])
+dai_len_temp = len(dai_check_temp)
+if dai_len != dai_len_temp:
+    dai_state_text = '台データ：state_cdに'+ str(dai_len - dai_len_temp) +'個の欠損があります\n'
+    dai_len = dai_len_temp
+
+dai_check_temp = dai_check_temp.dropna(subset=['機種名(店舗入力名)'])
+dai_len_temp = len(dai_check_temp)
+if dai_len != dai_len_temp:
+    dai_kisyu_text = '台データ：機種名(店舗入力名)に'+ str(dai_len - dai_len_temp) +'個の欠損があります\n'
+    dai_len = dai_len_temp
+
+dai_check_temp = dai_check_temp.dropna(subset=['pcode'])
+dai_len_temp = len(dai_check_temp)
+if dai_len != dai_len_temp:
+    dai_pcode_text = '台データ：pcodeに'+ str(dai_len - dai_len_temp) +'個の欠損があります\n'
+    dai_len = dai_len_temp
+
+
+tenpo_len = len(output_tenpo_to_csv)
+tenpo_check_temp = output_tenpo_to_csv.dropna(subset=['t_code'])
+tenpo_len_temp = len(tenpo_check_temp)
+if tenpo_len != tenpo_len_temp:
+    tenpo_tcode_text = '店舗データ：t_codeに'+ str(tenpo_len - tenpo_len_temp) +'個の欠損があります\n'
+    tenpo_len = tenpo_len_temp
+
+tenpo_check_temp = tenpo_check_temp.dropna(subset=['ホール名'])
+tenpo_len_temp = len(tenpo_check_temp)
+if tenpo_len != tenpo_len_temp:
+    tenpo_hole_text = '店舗データ：ホール名に'+ str(tenpo_len - tenpo_len_temp) +'個の欠損があります\n'
+    tenpo_len = tenpo_len_temp
+
+tenpo_check_temp = tenpo_check_temp.dropna(subset=['address'])
+tenpo_len_temp = len(tenpo_check_temp)
+if tenpo_len != tenpo_len_temp:
+    tenpo_address_text = '店舗データ：addressに'+ str(tenpo_len - tenpo_len_temp) +'個の欠損があります\n'
+    tenpo_len = tenpo_len_temp
+
+output_text = str(kisyu_th_text + dai_th_text + tenpo_th_text + kisyu_pcode_text + kisyu_kisyu_text + kisyu_PS_text + dai_state_text + dai_kisyu_text + dai_pcode_text + tenpo_tcode_text + tenpo_hole_text + tenpo_address_texts)
+if output_text != '':
+    mail_gun(output_text)
+
 
 logging.info('==============Connect: Daito-Network==================')
 
