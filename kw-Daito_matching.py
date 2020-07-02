@@ -714,13 +714,13 @@ try:
     # SFTPセッション開始
     sftp_connection = client.open_sftp()
     # ファイル出力
-    file_kisyu = sftp_connection.file('/p_kisyu_'+ dir_date +'.csv', "a", -1)
+    file_kisyu = sftp_connection.file('/incoming/p_kisyu_'+ dir_date +'.csv', "a", -1)
     file_kisyu.write("\uFEFF")
     file_kisyu.write(output_kisyu_to_csv.to_csv(index=False, encoding="utf-8"))
-    file_dai = sftp_connection.file('/p_dai_'+ dir_date +'.csv', "a", -1)
+    file_dai = sftp_connection.file('/incoming/p_dai_'+ dir_date +'.csv', "a", -1)
     file_dai.write("\uFEFF")
     file_dai.write(output_dai_to_csv.to_csv(index=False, encoding="utf-8"))
-    file_tempo = sftp_connection.file('/p_tenpo_'+ dir_date +'.csv', "a", -1)
+    file_tempo = sftp_connection.file('/incoming/p_tenpo_'+ dir_date +'.csv', "a", -1)
     file_tempo.write("\uFEFF")
     file_tempo.write(output_tenpo_to_csv.to_csv(index=False, encoding="utf-8"))
 finally:
