@@ -386,6 +386,7 @@ output_dai_to_csv['設置台数'] = table_array_outer['num_x']
 output_dai_to_csv['貸玉量'] = table_array_outer['rate']
 output_dai_to_csv['更新日付'] = table_array_outer['co_date_x']
 output_dai_to_csv = output_dai_to_csv.loc[:, ['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付']]
+output_dai_to_csv = output_dai_to_csv.drop_duplicates(subset=['t_code','pcode','貸玉量'])
 
 logging.info('=======================店舗データ=======================')
 logging.info('================clensing : DM_store_array=============')
@@ -603,28 +604,57 @@ output_tenpo_d['tenpo_update'] = DM_store_array_output['tenpo_update_x']
 output_tenpo_d['co_date'] = DM_store_array_output['co_date_y']
 output_tenpo_d['dmm_t_code'] = 'dmm_' + DM_store_array_output['dmm_t_code_y']
 
-output_tenpo_pc = output_tenpo_pc.rename(columns={'総務省コード_x' : '総務省コード'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'ホール名_x' : 'ホール名'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'address_x' : 'address'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'access_x' : 'access'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'closeday_x' : 'closeday'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'opentime_x' : 'opentime'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'service_x' : 'service'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'rate_x' : 'rate'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'dai_x' : 'dai'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'dai_p_x' : 'dai_p'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'dai_s_x' : 'dai_s'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'dai_sum_x' : 'dai_sum'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'parking_x' : 'parking'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'tel_x' : 'tel'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'url_y' : 'url'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'tenpo_update_x' : 'tenpo_update'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'merge_url_x' : 'merge_url'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'tel_x' : 'tel'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'co_date_x' : 'co_date'})
-output_tenpo_pc['dmm_t_code'] = 'dmm_' + output_tenpo_pc['dmm_t_code']
+output_tenpo_pc_drop_PW = output_tenpo_pc.dropna(subset=['state_cd_x'])
+output_tenpo_pc_drop_DM = output_tenpo_pc[output_tenpo_pc['state_cd_x'].isnull()]
 
-output_tenpo_to_csv = pd.concat([output_tenpo_pc, output_tenpo_match, output_tenpo_p, output_tenpo_d],sort=True)
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'総務省コード_x' : '総務省コード'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'ホール名_x' : 'ホール名'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'address_x' : 'address'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'access_x' : 'access'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'state_cd_x' : 'state_cd'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'t_code_x' : 't_code'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'closeday_x' : 'closeday'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'opentime_x' : 'opentime'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'service_x' : 'service'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'rate_x' : 'rate'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'dai_x' : 'dai'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'dai_p_x' : 'dai_p'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'dai_s_x' : 'dai_s'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'dai_sum_x' : 'dai_sum'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'parking_x' : 'parking'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'tel_x' : 'tel'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'url_y' : 'url'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'tenpo_update_x' : 'tenpo_update'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'merge_url_x' : 'merge_url'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'tel_x' : 'tel'})
+output_tenpo_pc_drop_PW = output_tenpo_pc_drop_PW.rename(columns={'co_date_x' : 'co_date'})
+output_tenpo_pc_drop_PW['dmm_t_code'] = 'dmm_' + output_tenpo_pc_drop_PW['dmm_t_code']
+
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'総務省コード_y' : '総務省コード'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'ホール名_y' : 'ホール名'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'address_y' : 'address'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'access_y' : 'access'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'state_cd_y' : 'state_cd'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'t_code_y' : 't_code'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'closeday_y' : 'closeday'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'opentime_y' : 'opentime'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'service_y' : 'service'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'rate_y' : 'rate'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'dai_y' : 'dai'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'dai_p_y' : 'dai_p'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'dai_s_y' : 'dai_s'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'dai_sum_y' : 'dai_sum'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'parking_y' : 'parking'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'tel_y' : 'tel'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'url_y' : 'url'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'tenpo_update_y' : 'tenpo_update'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'merge_url_y' : 'merge_url'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'tel_y' : 'tel'})
+output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'co_date_y' : 'co_date'})
+output_tenpo_pc_drop_DM['dmm_t_code'] = 'dmm_' + output_tenpo_pc_drop_DM['dmm_t_code']
+
+output_tenpo_to_csv = pd.concat([output_tenpo_pc_drop_PW ,output_tenpo_pc_drop_DM, output_tenpo_match, output_tenpo_p, output_tenpo_d],sort=True)
+
 output_tenpo_to_csv = output_tenpo_to_csv.loc[:, ['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code']]
 
 
