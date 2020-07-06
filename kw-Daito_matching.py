@@ -215,8 +215,9 @@ DM_model_array_clensing['s_date'] = DM_model_array_clensing['s_date'].apply(dele
 DM_model_array_clensing['s_date'] = ''
 DM_model_array_clensing['s_date'] = DM_model_array_clensing['s_date'].str.replace('上旬予定','').str.replace('予定','')
 DM_model_array_clensing['s_date'] = DM_model_array_clensing['s_date'].apply(add_zero)
-DM_model_array_clensing['info1'] = DM_model_array_clensing['info1'].str.replace('件','').str.replace('(','').str.replace(')','')
+DM_model_array_clensing['info1'] = DM_model_array_clensing['info1'].str.replace('件','').str.replace('（','').str.replace('）','')
 DM_model_array_clensing['site'] = 1
+DM_model_array_clensing = DM_model_array_clensing.drop_duplicates(subset=['clensing_title','P_S'])
 
 logging.info('===============clensing : PW_model_array==============')
 
@@ -229,126 +230,78 @@ PW_model_array_clensing['clensing_title'] = PW_model_array_clensing['clensing_ti
 PW_model_array_clensing['clensing_title'] = PW_model_array_clensing['clensing_title'].str.replace('‐','').str.replace('｢','').str.replace('｣','').str.replace('･','').str.replace('〜','').str.replace('【','').str.replace('】','').str.replace('‐','')
 PW_model_array_clensing['d_date'] = PW_model_array_clensing['d_date'].str.replace('導入開始：','')
 PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].str.replace('調査日：','')
-PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].str.replace('上旬予定','').str.replace('予定','')
+PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].str.replace('上旬','').str.replace('下旬','').str.replace('予定','')
 PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].apply(add_zero)
 PW_model_array_clensing['site'] = 0
 
 logging.info('===================check: model_list==================')
 
-DM_model_array_clensing = DM_model_array_clensing.drop_duplicates(subset=['clensing_title','P_S'])
 DM_model_array_merge = pd.merge(DM_model_array_clensing, model_pair_array, on='dmm_pcode', how='left')
+DM_model_array_merge = DM_model_array_merge.drop_duplicates(subset=['title','P_S'])
 PW_model_array_merge = pd.merge(PW_model_array_clensing, model_pair_array, on='pw_pcode', how='left')
-PW_model_array_merge_dropDM = PW_model_array_merge.dropna(subset=['dmm_pcode_y'])
+PW_model_array_merge = PW_model_array_merge.drop_duplicates(subset=['title','P_S'])
+model_array_merge = pd.merge(PW_model_array_merge, DM_model_array_merge, on=['clensing_title','P_S'], how='left')
+model_array_merge_for_not_match = model_array_merge.copy()
+model_array_merge = model_array_merge.rename(columns={'title_x':'機種名'})
+model_array_merge = model_array_merge.rename(columns={'maker_x':'maker'})
+model_array_merge = model_array_merge.rename(columns={'k_kind_x':'k_kind'})
+model_array_merge = model_array_merge.rename(columns={'info1_y':'レビュー件数'})
+model_array_merge = model_array_merge.rename(columns={'info2_y':'レビュースコア'})
+model_array_merge = model_array_merge.rename(columns={'info4_x':'機種種別'})
+model_array_merge = model_array_merge.rename(columns={'pw_pcode':'pcode'})
+model_array_merge = model_array_merge.rename(columns={'d_date_x':'導入年月'})
+model_array_merge = model_array_merge.rename(columns={'s_date_x':'更新日付'})
+model_array_merge['レビュー件数'] = model_array_merge['レビュー件数'].fillna(0)
+model_array_merge['レビュースコア'] = model_array_merge['レビュースコア'].fillna('0.00')
+model_array_merge = model_array_merge.drop(columns=['clensing_title', 'type_y', 'info10_y', 'title_y', 'title6_x', 'title10_y', 'k_kind_y', 'd_date_y', 'pw_pcode_x', 'title11_y', 'info11_y', 'title5_y', 'info5_y', 'info8_x', 'title6_y', 'info6_y', 'title7_y', 'info7_y', 'title8_y', 'info8_y', 'title9_y', 'info9_y', 'title11_x', 'info11_x', 'title8_x', 'info9_x', 'title9_x', 'info10_x', 'title10_x', 'info11_x', 'title11_x', 'info6_x', 'k_kind', 'title5_x', 'info5_x', 'title7_x', 'info7_x', 'title1_y', 'title2_y', 'title3_y', 'title4_y', 'info4_y', 'update_date', 'k_comment_y', 'title0_y', 'info0_y', 'info3_y', 'dmm_pcode_x', 'url', 'pw_pcode_y', 's_date_y', 'type_x', 'site_x', 'site_y', 'maker_y', 'k_comment_x', 'title0_x', 'info0_x', 'title1_x', 'info1_x', 'title2_x', 'info2_x', 'title3_x', 'info3_x', 'title4_x'])
+model_array_merge['dmm_pcode_y'] = model_array_merge['dmm_pcode_y'].fillna(0)
+model_array_merge['dmm_pcode'] = model_array_merge['dmm_pcode'].fillna(0)
+model_array_merge['dmm_pcode'] = model_array_merge['dmm_pcode_y'].where((model_array_merge['dmm_pcode'] == 0) & (model_array_merge['dmm_pcode_y'] != 0 ), model_array_merge['dmm_pcode'])
+model_array_merge['dmm_pcode'] = model_array_merge['dmm_pcode'].str.replace('0','')
+model_array_merge = model_array_merge.drop(columns='dmm_pcode_y')
 
-output_kisyu_p = pd.DataFrame(columns=['clensing_title','pcode', '機種名', 'Ｐ／Ｓ区分', '機種種別', 'タイプ', 'メーカー名', '機種コメント', '情報0', '内容0', '情報1', '内容1', '情報2', '内容2', '情報3', '内容3', '情報4', '内容4', '情報5', '内容5', '情報6', '内容6', '情報7', '内容7', '情報8', '内容8', '情報9', '内容9', '情報10', '内容10', '情報11', '内容11', '導入年月', '更新日付', 'dmm_pcode'])
-output_kisyu_p['clensing_title'] = PW_model_array_merge_dropDM['clensing_title']
-output_kisyu_p['pcode'] = 'p' + PW_model_array_merge_dropDM['pw_pcode']
-output_kisyu_p['機種名'] = PW_model_array_merge_dropDM['title']
-output_kisyu_p['Ｐ／Ｓ区分'] = PW_model_array_merge_dropDM['P_S']
-output_kisyu_p['機種種別'] = PW_model_array_merge_dropDM['k_kind']
-output_kisyu_p['メーカー名'] = PW_model_array_merge_dropDM['maker']
-output_kisyu_p['情報0'] = '型式名'
-output_kisyu_p['内容0'] = PW_model_array_merge_dropDM['info0']
-output_kisyu_p['情報1'] = 'レビュー件数'
-output_kisyu_p['内容1'] = PW_model_array_merge_dropDM['info1']
-output_kisyu_p['情報2'] = 'レビュースコア'
-output_kisyu_p['内容2'] = PW_model_array_merge_dropDM['info2']
-output_kisyu_p['導入年月'] = PW_model_array_merge_dropDM['d_date']
-output_kisyu_p['更新日付'] = PW_model_array_merge_dropDM['s_date']
-output_kisyu_p['dmm_pcode'] = 'dmm_' + PW_model_array_merge_dropDM['dmm_pcode_y']
+output_kisyu_to_csv = pd.DataFrame(columns=['pcode', '機種名', 'Ｐ／Ｓ区分', '機種種別', 'タイプ', 'メーカー名', '機種コメント', '情報0', '内容0', '情報1', '内容1', '情報2', '内容2', '情報3', '内容3', '情報4', '内容4', '情報5', '内容5', '情報6', '内容6', '情報7', '内容7', '情報8', '内容8', '情報9', '内容9', '情報10', '内容10', '情報11', '内容11', '導入年月', '更新日付', 'dmm_pcode'])
 
+output_kisyu_to_csv['pcode'] = 'p' + model_array_merge['pcode']
+output_kisyu_to_csv['機種名'] = model_array_merge['機種名']
+output_kisyu_to_csv['Ｐ／Ｓ区分'] = model_array_merge['P_S']
+output_kisyu_to_csv['機種種別'] = model_array_merge['機種種別']
+output_kisyu_to_csv['メーカー名'] = model_array_merge['maker']
+output_kisyu_to_csv['情報0'] = '型式名'
+output_kisyu_to_csv['内容0'] = model_array_merge['機種名']
+output_kisyu_to_csv['情報1'] = 'レビュー件数'
+output_kisyu_to_csv['内容1'] = model_array_merge['レビュー件数']
+output_kisyu_to_csv['情報2'] = 'レビュースコア'
+output_kisyu_to_csv['内容2'] = model_array_merge['レビュースコア']
+output_kisyu_to_csv['導入年月'] = model_array_merge['導入年月']
+output_kisyu_to_csv['更新日付'] = model_array_merge['更新日付']
+output_kisyu_to_csv['dmm_pcode'] = 'dmm_' + model_array_merge['dmm_pcode']
 
-logging.info('===============duplicate : output_kisyu===============')
-
-DM_model_duplicate = DM_model_array_merge[DM_model_array_merge['pw_pcode_y'].isnull()]
-PW_model_duplicate = PW_model_array_merge[PW_model_array_merge['dmm_pcode_y'].isnull()]
-
-model_array_output = pd.merge(PW_model_duplicate, DM_model_duplicate, on=['clensing_title','P_S'], how='left')
-model_array_output = model_array_output.drop_duplicates(subset=['clensing_title','P_S'])
-output_kisyu = pd.DataFrame(columns=['clensing_title','pcode', '機種名', 'Ｐ／Ｓ区分', '機種種別', 'タイプ', 'メーカー名', '機種コメント', '情報0', '内容0', '情報1', '内容1', '情報2', '内容2', '情報3', '内容3', '情報4', '内容4', '情報5', '内容5', '情報6', '内容6', '情報7', '内容7', '情報8', '内容8', '情報9', '内容9', '情報10', '内容10', '情報11', '内容11', '導入年月', '更新日付', 'dmm_pcode'])
-output_kisyu['clensing_title'] = model_array_output['clensing_title']
-output_kisyu['pcode'] = 'p' + model_array_output['pw_pcode']
-output_kisyu['機種名'] = model_array_output['title_x']
-output_kisyu['Ｐ／Ｓ区分'] = model_array_output['P_S']
-output_kisyu['機種種別'] = model_array_output['k_kind_x']
-output_kisyu['メーカー名'] = model_array_output['maker_x']
-output_kisyu['情報0'] = '型式名'
-output_kisyu['内容0'] = model_array_output['info0_x']
-output_kisyu['情報1'] = 'レビュー件数'
-output_kisyu['内容1'] = model_array_output['info1_y']
-output_kisyu['情報2'] = 'レビュースコア'
-output_kisyu['内容2'] = model_array_output['info2_y']
-output_kisyu['導入年月'] = model_array_output['d_date_x']
-output_kisyu['更新日付'] = model_array_output['s_date_x']
-output_kisyu['dmm_pcode'] = 'dmm_' + model_array_output['dmm_pcode_y']
-
-output_kisyu_to_csv = pd.concat([output_kisyu_p, output_kisyu])
 output_kisyu_to_csv_temp = output_kisyu_to_csv
-output_kisyu_to_csv = output_kisyu_to_csv.drop('clensing_title', axis=1)
 output_kisyu_to_csv = output_kisyu_to_csv.drop_duplicates(subset=['機種名','pcode'])
-
-logging.info('================output : output_kisyu_pair============')
-
-model_output_array_inner = pd.merge(PW_model_duplicate, DM_model_duplicate, on='clensing_title', how='inner')
-model_output_pair_array = pd.DataFrame(columns=['dmm_pcode','pw_pcode'])
-model_output_pair_array['pw_pcode'] = model_output_array_inner['pw_pcode']
-model_output_pair_array['dmm_pcode'] = model_output_array_inner['dmm_pcode']
-output_pair_to_csv = pd.concat([model_pair_array, model_output_pair_array])
+output_kisyu_to_csv.to_csv("c:/users/岩野 勇弥/desktop/【大都技研】/02.data/output/p_kisyu_○○.csv",encoding='utf_8_sig', index=False ,sep=',' , quotechar='"', quoting=csv.QUOTE_ALL)
 
 logging.info('==========duplicate : output_kisyu_not_match==========')
 
-output_kisyu_to_csv_temp['pcode'] = model_array_output['pw_pcode'].str.replace('p','')
-PW_model_not_match = output_kisyu_to_csv_temp[output_kisyu_to_csv_temp['dmm_pcode'].isnull()]
-model_output_array_inner2 = pd.merge(PW_model_array_merge, DM_model_array_merge, on='clensing_title', how='inner')
-model_output_array_inner2 = model_output_array_inner2.drop_duplicates(subset=['clensing_title','P_S_x'])
-model_output_array_outer = pd.merge(PW_model_duplicate, DM_model_duplicate, on='clensing_title', how='outer')
-model_output_array_outer['比較用の列'] = model_output_array_outer.apply(lambda x: '{}_{}'.format(x[0], x[35]), axis=1)
-output_kisyu_to_csv_temp['比較用の列'] = output_kisyu_to_csv_temp.apply(lambda x: '{}_{}'.format(x[0], x[34]), axis=1)
+model_output_array_inner = pd.merge(PW_model_array_merge, DM_model_array_merge, on=['clensing_title','P_S'], how='inner')
+model_output_array_outer = pd.merge(PW_model_array_merge, DM_model_array_merge, on=['clensing_title','P_S'], how='outer')
 
-PW_model_not_match = model_output_array_outer[~model_output_array_outer['比較用の列'].isin(output_kisyu_to_csv_temp['比較用の列'])]
-PW_model_not_match = PW_model_not_match.drop_duplicates(subset=['clensing_title','P_S_x'])
-PW_model_not_match['info1_y'] = PW_model_not_match['info1_x'].str.replace('件','').str.replace('（','').str.replace('）','')
-PW_model_not_match['d_date_x'] = PW_model_not_match['d_date_x'].fillna('')
-PW_model_not_match['d_date_x'] = PW_model_not_match['d_date_x'].apply(check_date)
-PW_model_not_match = PW_model_not_match.dropna(subset=['site_x'])
+model_output_array_inner['比較用の列'] = model_output_array_inner.apply(lambda x: '{}_{}'.format(x[2], x[35]), axis=1)
+model_output_array_outer['比較用の列'] = model_output_array_outer.apply(lambda x: '{}_{}'.format(x[2], x[35]), axis=1)
+model_array_merge_for_not_match['比較用の列'] = model_output_array_outer.apply(lambda x: '{}_{}'.format(x[2], x[35]), axis=1)
 
-DM_model_not_match = model_output_array_outer[~model_output_array_outer['比較用の列'].isin(output_kisyu_to_csv_temp['比較用の列'])]
-DM_model_not_match = DM_model_not_match.drop_duplicates(subset=['clensing_title','P_S_y'])
-DM_model_not_match['info1_y'] = DM_model_not_match['info1_y'].str.replace('件','').str.replace('（','').str.replace('）','')
-DM_model_not_match['d_date_y'] = DM_model_not_match['d_date_y'].fillna('')
-DM_model_not_match['d_date_y'] = DM_model_not_match['d_date_y'].apply(check_date)
-DM_model_not_match = DM_model_not_match.dropna(subset=['site_y'])
+PW_model_not_match = model_array_merge_for_not_match[~model_array_merge_for_not_match['比較用の列'].isin(model_output_array_inner['比較用の列'])]
+DM_model_not_match = model_output_array_outer[~model_output_array_outer['比較用の列'].isin(model_array_merge_for_not_match['比較用の列'])]
 
-output_kisyu_not_match_PW = pd.DataFrame(columns=['pcode', '機種名', 'Ｐ／Ｓ区分', '機種種別', 'タイプ', 'メーカー名', '機種コメント', '情報0', '内容0', '情報1', '内容1', '情報2', '内容2', '情報3', '内容3', '情報4', '内容4', '情報5', '内容5', '情報6', '内容6', '情報7', '内容7', '情報8', '内容8', '情報9', '内容9', '情報10', '内容10', '情報11', '内容11', '導入年月', '更新日付', 'dmm_pcode'])
+output_kisyu_not_match_PW = pd.DataFrame(columns=['pcode', '機種名', 'Ｐ／Ｓ区分'])
 output_kisyu_not_match_PW['pcode'] = 'p' + PW_model_not_match['pw_pcode']
 output_kisyu_not_match_PW['機種名'] = PW_model_not_match['title_x']
-output_kisyu_not_match_PW['Ｐ／Ｓ区分'] = PW_model_not_match['P_S_x']
-output_kisyu_not_match_PW['機種種別'] = PW_model_not_match['k_kind_x']
-output_kisyu_not_match_PW['メーカー名'] = PW_model_not_match['maker_x']
-output_kisyu_not_match_PW['情報0'] = '型式名'
-output_kisyu_not_match_PW['内容0'] = PW_model_not_match['info0_x']
-output_kisyu_not_match_PW['情報1'] = 'レビュー件数'
-output_kisyu_not_match_PW['情報1'] = PW_model_not_match['info1_x']
-output_kisyu_not_match_PW['情報2'] = 'レビュースコア'
-output_kisyu_not_match_PW['内容2'] = PW_model_not_match['info2_x']
-output_kisyu_not_match_PW['導入年月'] = PW_model_not_match['d_date_x']
-output_kisyu_not_match_PW['更新日付'] = PW_model_not_match['s_date_x']
+output_kisyu_not_match_PW['Ｐ／Ｓ区分'] = PW_model_not_match['P_S']
 
-output_kisyu_not_match_DM = pd.DataFrame(columns=['pcode', '機種名', 'Ｐ／Ｓ区分', '機種種別', 'タイプ', 'メーカー名', '機種コメント', '情報0', '内容0', '情報1', '内容1', '情報2', '内容2', '情報3', '内容3', '情報4', '内容4', '情報5', '内容5', '情報6', '内容6', '情報7', '内容7', '情報8', '内容8', '情報9', '内容9', '情報10', '内容10', '情報11', '内容11', '導入年月', '更新日付', 'dmm_pcode'])
-output_kisyu_not_match_DM['機種名'] = DM_model_not_match['title_y']
-output_kisyu_not_match_DM['Ｐ／Ｓ区分'] = DM_model_not_match['P_S_y']
-output_kisyu_not_match_DM['機種種別'] = DM_model_not_match['k_kind_y']
-output_kisyu_not_match_DM['メーカー名'] = DM_model_not_match['maker_y']
-output_kisyu_not_match_DM['情報0'] =  '型式名'
-output_kisyu_not_match_DM['内容0'] = DM_model_not_match['info0_y']
-output_kisyu_not_match_DM['情報1'] = 'レビュー件数'
-output_kisyu_not_match_DM['内容1'] = DM_model_not_match['info1_y']
-output_kisyu_not_match_DM['情報2'] = 'レビュースコア'
-output_kisyu_not_match_DM['内容2'] = DM_model_not_match['info2_y']
-output_kisyu_not_match_DM['導入年月'] = DM_model_not_match['d_date_y']
-output_kisyu_not_match_DM['更新日付'] = DM_model_not_match['s_date_y']
+output_kisyu_not_match_DM = pd.DataFrame(columns=['dmm_pcode', '機種名', 'Ｐ／Ｓ区分'])
 output_kisyu_not_match_DM['dmm_pcode'] = 'dmm_' + DM_model_not_match['dmm_pcode']
-
+output_kisyu_not_match_DM['機種名'] = DM_model_not_match['title_y']
+output_kisyu_not_match_DM['Ｐ／Ｓ区分'] = DM_model_not_match['P_S']
 
 logging.info('=========================台データ=======================')
 logging.info('================clensing : DM_table_array=============')
@@ -402,35 +355,37 @@ PW_table_array_clensing['site'] = 0
 
 logging.info('==================marge : table_array=================')
 
-table_array_innner = pd.merge(PW_table_array_clensing, DM_table_array_clensing, on=['clensing_title', 'rate', 'state_cd', 'p_code'], how='left')
+output_dai_to_csv = pd.DataFrame(columns=['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付'])
+table_array_outer = pd.merge(PW_table_array_clensing, DM_table_array_clensing, on=['clensing_title', 'rate', 'state_cd'], how='outer')
 
-PW_table_array_output = table_array_innner.dropna(subset=['site_x'])
-DM_table_array_output = table_array_innner.dropna(subset=['site_y'])
+table_check = table_array_outer.copy()
 
-output_dai_p = pd.DataFrame(columns=['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付'])
-output_dai_d = pd.DataFrame(columns=['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付'])
+table_array_outer['num_x'] = table_array_outer['num_x'].str.replace('#NAME?','0')
+table_array_outer['num_y'] = table_array_outer['num_y'].str.replace('#NAME?','0')
+table_array_outer['num_x'] = table_array_outer['num_x'].fillna(0)
+table_array_outer['num_y'] = table_array_outer['num_y'].fillna(0)
 
-output_dai_p['state_cd'] = PW_table_array_output['state_cd']
-output_dai_p['t_code'] = PW_table_array_output['pw_t_code']
-output_dai_p['pcode'] = PW_table_array_output['p_code']
-output_dai_p['正式機種名'] = PW_table_array_output['p_title_x']
-output_dai_p['機種名(店舗入力名)'] = PW_table_array_output['p_title_x']
-output_dai_p['設置台数'] = PW_table_array_output['num_x']
-output_dai_p['貸玉量'] = PW_table_array_output['rate']
-output_dai_p['更新日付'] = PW_table_array_output['co_date_x']
+table_array_outer['p_title_x'] = table_array_outer['p_title_x'].fillna('')
+table_array_outer['p_title_y'] = table_array_outer['p_title_y'].fillna('')
+table_array_outer['pw_t_code'] = table_array_outer['pw_t_code'].fillna('')
+table_array_outer['dmm_t_code'] = table_array_outer['dmm_t_code'].fillna('')
+table_array_outer['co_date_x'] = table_array_outer['co_date_x'].fillna('')
+table_array_outer['co_date_y'] = table_array_outer['co_date_y'].fillna('')
 
-output_dai_d['state_cd'] = DM_table_array_output['state_cd']
-output_dai_d['t_code'] = DM_table_array_output['pw_t_code']
-output_dai_d['pcode'] = DM_table_array_output['p_code']
-output_dai_d['機種名(店舗入力名)'] = DM_table_array_output['p_title_y']
-output_dai_d['設置台数'] = DM_table_array_output['num_x']
-output_dai_d['貸玉量'] = DM_table_array_output['rate']
-output_dai_d['更新日付'] = DM_table_array_output['co_date_y']
+table_array_outer['num_x'] = table_array_outer['num_y'].where((table_array_outer['num_x'] == 0) & (table_array_outer['num_y'] != 0 ), table_array_outer['num_x'])
+table_array_outer['p_title_y'] = table_array_outer['p_title_x'].where((table_array_outer['p_title_y'] == '' ) & (table_array_outer['p_title_x'] != ''), table_array_outer['p_title_y'])
+table_array_outer['pw_t_code'] = table_array_outer['dmm_t_code'].where((table_array_outer['pw_t_code'] == '') & (table_array_outer['dmm_t_code'] != ''), table_array_outer['pw_t_code'])
+table_array_outer['co_date_x'] = table_array_outer['co_date_y'].where((table_array_outer['co_date_x'] == '' ) & (table_array_outer['co_date_y'] != ''), table_array_outer['co_date_x'])
 
-output_dai_to_csv = pd.concat([output_dai_p, output_dai_d],sort=True)
+output_dai_to_csv['state_cd'] = table_array_outer['state_cd']
+output_dai_to_csv['t_code'] = table_array_outer['pw_t_code']
+output_dai_to_csv['pcode'] = table_array_outer['p_code_x']
+output_dai_to_csv['正式機種名'] = table_array_outer['p_title_x']
+output_dai_to_csv['機種名(店舗入力名)'] = table_array_outer['p_title_y']
+output_dai_to_csv['設置台数'] = table_array_outer['num_x']
+output_dai_to_csv['貸玉量'] = table_array_outer['rate']
+output_dai_to_csv['更新日付'] = table_array_outer['co_date_x']
 output_dai_to_csv = output_dai_to_csv.loc[:, ['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付']]
-
-
 
 logging.info('=======================店舗データ=======================')
 logging.info('================clensing : DM_store_array=============')
@@ -486,109 +441,124 @@ PW_store_array_clensing['dai_p'] = PW_store_array_clensing['dai_sprit'].apply(sp
 PW_store_array_clensing['dai_s'] = PW_store_array_clensing['dai_sprit'].apply(sprit_dai_s)
 PW_store_array_clensing['dai_sum'] = PW_store_array_clensing['dai_sprit'].apply(sprit_dai_sum)
 PW_store_array_clensing['co_date'] = date
-
-
-PW_store_array_clensing = PW_store_array_clensing.drop_duplicates(subset='pw_t_code')
-PW_store_array_clensing = PW_store_array_clensing.drop_duplicates(subset=['clensing_title','state_cd'])
 PW_store_array_clensing['site'] = 0
 
 
 logging.info('===================check: Store_list==================')
 
 store_pair_array = store_pair_array.rename(columns={'t_code':'pw_t_code'})
-store_pair_array = store_pair_array.drop_duplicates(subset='pw_t_code')
-store_pair_array = store_pair_array.drop_duplicates(subset='dmm_t_code')
 
 PW_store_array_merge = pd.merge(PW_store_array_clensing, store_pair_array, on='pw_t_code', how='inner')
-PW_store_array_merged = PW_store_array_merge.dropna(subset=['dmm_t_code_y'])
-
-logging.info('===============duplicate : output_kisyu===============')
-
-output_tenpo_pp = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
-output_tenpo_pp['state_cd'] = PW_store_array_merged['state_cd'] 
-output_tenpo_pp['t_code'] =  PW_store_array_merged['pw_t_code'] 
-output_tenpo_pp['ホール名'] =   PW_store_array_merged['name'] 
-output_tenpo_pp['address'] =PW_store_array_merged['address'] 
-output_tenpo_pp['access'] = PW_store_array_merged['access'] 
-output_tenpo_pp['closeday'] =PW_store_array_merged['closeday'] 
-output_tenpo_pp['opentime'] = PW_store_array_merged['opentime'] 
-output_tenpo_pp['service'] = PW_store_array_merged['service'] 
-output_tenpo_pp['rate'] = PW_store_array_merged['rate']
-output_tenpo_pp['dai'] = PW_store_array_merged['dai'] 
-output_tenpo_pp['dai_p'] = PW_store_array_merged['dai_p'] 
-output_tenpo_pp['dai_s'] = PW_store_array_merged['dai_s'] 
-output_tenpo_pp['dai_sum'] = PW_store_array_merged['dai_sum'] 
-output_tenpo_pp['parking'] = PW_store_array_merged['parking'] 
-output_tenpo_pp['tel'] = PW_store_array_merged['tel']
-output_tenpo_pp['tenpo_update'] = PW_store_array_merged['tenpo_update'] 
-output_tenpo_pp['co_date'] = PW_store_array_merged['co_date'] 
-output_tenpo_pp['pw_t_code'] = PW_store_array_merged['pw_t_code'] 
-output_tenpo_pp['dmm_t_code'] = 'dmm_' + PW_store_array_merged['dmm_t_code_y'] 
-output_tenpo_pp['merge_url'] = PW_store_array_merged['url']
-output_tenpo_pp['clensing_title'] = PW_store_array_merged['clensing_title'] 
-output_tenpo_pp = output_tenpo_pp.drop_duplicates(subset=['clensing_title','state_cd'])
+PW_store_array_merge_drop_DM = PW_store_array_merge.dropna(subset=['dmm_t_code_y'])
 
 DM_store_array_merge = pd.merge(DM_store_array_clensing, store_pair_array, on='dmm_t_code', how='inner')
-DM_store_array_merged = DM_store_array_merge.dropna(subset=['pw_t_code_y'])
+DM_store_array_merge_drop_PW = DM_store_array_merge.dropna(subset=['pw_t_code_y'])
+
+
+logging.info('===============duplicate : output_tenpo===============')
+
+output_tenpo_pp = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
+output_tenpo_pp['state_cd'] = PW_store_array_merge_drop_DM['state_cd'] 
+output_tenpo_pp['t_code'] =  PW_store_array_merge_drop_DM['pw_t_code'] 
+output_tenpo_pp['ホール名'] =   PW_store_array_merge_drop_DM['name'] 
+output_tenpo_pp['address'] =PW_store_array_merge_drop_DM['address'] 
+output_tenpo_pp['access'] = PW_store_array_merge_drop_DM['access'] 
+output_tenpo_pp['closeday'] =PW_store_array_merge_drop_DM['closeday'] 
+output_tenpo_pp['opentime'] = PW_store_array_merge_drop_DM['opentime'] 
+output_tenpo_pp['service'] = PW_store_array_merge_drop_DM['service'] 
+output_tenpo_pp['rate'] = PW_store_array_merge_drop_DM['rate']
+output_tenpo_pp['dai'] = PW_store_array_merge_drop_DM['dai'] 
+output_tenpo_pp['dai_p'] = PW_store_array_merge_drop_DM['dai_p'] 
+output_tenpo_pp['dai_s'] = PW_store_array_merge_drop_DM['dai_s'] 
+output_tenpo_pp['dai_sum'] = PW_store_array_merge_drop_DM['dai_sum'] 
+output_tenpo_pp['parking'] = PW_store_array_merge_drop_DM['parking'] 
+output_tenpo_pp['tel'] = PW_store_array_merge_drop_DM['tel']
+output_tenpo_pp['tenpo_update'] = PW_store_array_merge_drop_DM['tenpo_update'] 
+output_tenpo_pp['co_date'] = PW_store_array_merge_drop_DM['co_date'] 
+output_tenpo_pp['pw_t_code'] = PW_store_array_merge_drop_DM['pw_t_code'] 
+output_tenpo_pp['dmm_t_code'] = 'dmm_' + PW_store_array_merge_drop_DM['dmm_t_code_y'] 
+output_tenpo_pp['merge_url'] = PW_store_array_merge_drop_DM['url']
+output_tenpo_pp['clensing_title'] = PW_store_array_merge_drop_DM['clensing_title'] 
+output_tenpo_pp = output_tenpo_pp.drop_duplicates(subset=['clensing_title','state_cd'])
 
 output_tenpo_pd = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
-output_tenpo_pd['state_cd'] = DM_store_array_merged['state_cd']
-output_tenpo_pd['t_code'] = 'dmm_' + DM_store_array_merged['dmm_t_code']
-output_tenpo_pd['ホール名'] = DM_store_array_merged['name']
-output_tenpo_pd['address'] = DM_store_array_merged['address']
-output_tenpo_pd['access'] = DM_store_array_merged['access']
-output_tenpo_pd['closeday'] = DM_store_array_merged['closeday']
-output_tenpo_pd['opentime'] = DM_store_array_merged['opentime']
-output_tenpo_pd['service'] = DM_store_array_merged['service']
-output_tenpo_pd['rate'] = DM_store_array_merged['rate']
-output_tenpo_pd['dai'] = DM_store_array_merged['dai']
-output_tenpo_pd['dai_p'] = DM_store_array_merged['dai_p']
-output_tenpo_pd['dai_s'] = DM_store_array_merged['dai_s']
-output_tenpo_pd['dai_sum'] = DM_store_array_merged['dai_sum']
-output_tenpo_pd['parking'] = DM_store_array_merged['parking']
-output_tenpo_pd['tel'] = DM_store_array_merged['tel']
-output_tenpo_pd['tenpo_update'] = DM_store_array_merged['tenpo_update']
-output_tenpo_pd['co_date'] = DM_store_array_merged['co_date']
-output_tenpo_pd['merge_url'] = DM_store_array_merged['url']
-output_tenpo_pd['dmm_t_code'] = 'dmm_' + DM_store_array_merged['dmm_t_code']
-output_tenpo_pd['clensing_title'] = DM_store_array_merged['clensing_title']
+output_tenpo_pd['state_cd'] = DM_store_array_merge_drop_PW['state_cd']
+output_tenpo_pd['t_code'] = 'dmm_' + DM_store_array_merge_drop_PW['dmm_t_code']
+output_tenpo_pd['ホール名'] = DM_store_array_merge_drop_PW['name']
+output_tenpo_pd['address'] = DM_store_array_merge_drop_PW['address']
+output_tenpo_pd['access'] = DM_store_array_merge_drop_PW['access']
+output_tenpo_pd['closeday'] = DM_store_array_merge_drop_PW['closeday']
+output_tenpo_pd['opentime'] = DM_store_array_merge_drop_PW['opentime']
+output_tenpo_pd['service'] = DM_store_array_merge_drop_PW['service']
+output_tenpo_pd['rate'] = DM_store_array_merge_drop_PW['rate']
+output_tenpo_pd['dai'] = DM_store_array_merge_drop_PW['dai']
+output_tenpo_pd['dai_p'] = DM_store_array_merge_drop_PW['dai_p']
+output_tenpo_pd['dai_s'] = DM_store_array_merge_drop_PW['dai_s']
+output_tenpo_pd['dai_sum'] = DM_store_array_merge_drop_PW['dai_sum']
+output_tenpo_pd['parking'] = DM_store_array_merge_drop_PW['parking']
+output_tenpo_pd['tel'] = DM_store_array_merge_drop_PW['tel']
+output_tenpo_pd['tenpo_update'] = DM_store_array_merge_drop_PW['tenpo_update']
+output_tenpo_pd['co_date'] = DM_store_array_merge_drop_PW['co_date']
+output_tenpo_pd['merge_url'] = DM_store_array_merge_drop_PW['url']
+output_tenpo_pd['pw_t_code'] = DM_store_array_merge_drop_PW['pw_t_code_y']
+output_tenpo_pd['dmm_t_code'] = 'dmm_' + DM_store_array_merge_drop_PW['dmm_t_code']
+output_tenpo_pd['clensing_title'] = DM_store_array_merge_drop_PW['clensing_title']
 
-output_tenpo_pc = pd.merge(output_tenpo_pp, output_tenpo_pd, on=['clensing_title','state_cd'], how='inner')
+output_tenpo_pc = pd.merge(output_tenpo_pp, output_tenpo_pd, on=['pw_t_code','dmm_t_code'], how='outer')
+output_tenpo_pc['dmm_t_code'] = output_tenpo_pc['dmm_t_code'].str.replace('dmm_','')
 
-output_tenpo_pc = output_tenpo_pc.rename(columns={'pw_t_code_x': 'pw_t_code'})
-output_tenpo_pc = output_tenpo_pc.rename(columns={'t_code_x': 't_code'})
 
 store_list_inner = pd.merge(PW_store_array_clensing, output_tenpo_pc, on='pw_t_code', how='inner')
-store_list_inner = store_list_inner.drop_duplicates(subset=['clensing_title_x','state_cd_x'])
 store_list_inner['比較用の列'] = store_list_inner.apply(lambda x: '{}_{}'.format(x[1], x[27]), axis=1)
 
 PW_store_array_clensing['比較用の列'] = PW_store_array_clensing.apply(lambda x: '{}_{}'.format(x[1], x[27]), axis=1)
 PW_store_list_match = PW_store_array_clensing[~PW_store_array_clensing['比較用の列'].isin(store_list_inner['比較用の列'])]
-
-output_tenpo_pc = output_tenpo_pc.rename(columns={'dmm_t_code_y': 'dmm_t_code'})
-output_tenpo_pc['dmm_t_code'] = output_tenpo_pc['dmm_t_code'].str.replace('dmm_','')
-store_list_inner = pd.merge(DM_store_array_clensing, output_tenpo_pc, on='dmm_t_code', how='inner')
-store_list_inner = store_list_inner.drop_duplicates(subset='dmm_t_code')
-store_list_inner['比較用の列'] = store_list_inner.apply(lambda x: '{}_{}'.format(x[1], x[27]), axis=1)
-DM_store_array_clensing['比較用の列'] = DM_store_array_clensing.apply(lambda x: '{}_{}'.format(x[1], x[27]), axis=1)
-DM_store_list_match = DM_store_array_clensing[~DM_store_array_clensing['比較用の列'].isin(store_list_inner['比較用の列'])]
-
-DM_store_duplicate = DM_store_list_match
 PW_store_duplicate = PW_store_list_match
 
+store_list_inner = pd.merge(DM_store_array_clensing, output_tenpo_pc, on='dmm_t_code', how='inner')
+store_list_inner['比較用の列'] = store_list_inner.apply(lambda x: '{}_{}'.format(x[1], x[27]), axis=1)
+
+DM_store_array_clensing['比較用の列'] = DM_store_array_clensing.apply(lambda x: '{}_{}'.format(x[1], x[27]), axis=1)
+DM_store_list_match = DM_store_array_clensing[~DM_store_array_clensing['比較用の列'].isin(store_list_inner['比較用の列'])]
+DM_store_duplicate = DM_store_list_match
+
 store_array_output = pd.merge(PW_store_duplicate, DM_store_duplicate, on=['clensing_title','state_cd'], how='inner')
-store_array_output = store_array_output.drop_duplicates(subset=['clensing_title','state_cd'])
 
-pair_tenpo = pd.DataFrame(columns=['t_code', 'dmm_t_code'])
-pair_tenpo['t_code'] = store_array_output['pw_t_code_x']
-pair_tenpo['dmm_t_code'] = store_array_output['dmm_t_code_y']
-store_pair_array = store_pair_array.rename(columns={'pw_t_code':'t_code'})
-output_pair = pd.concat([store_pair_array,pair_tenpo])
 
-store_array_output = pd.merge(PW_store_duplicate, DM_store_duplicate, on=['clensing_title','state_cd'], how='outer')
+# リストに追加は消す
+# pair_tenpo = pd.DataFrame(columns=['t_code', 'dmm_t_code'])
+# pair_tenpo['t_code'] = store_array_output['pw_t_code_x']
+# pair_tenpo['dmm_t_code'] = store_array_output['dmm_t_code_y']
+# store_pair_array = store_pair_array.rename(columns={'pw_t_code':'t_code'})
+# output_pair = pd.concat([store_pair_array,pair_tenpo])
 
-PW_store_array_output = store_array_output.dropna(subset=['site_x'])
-DM_store_array_output = store_array_output.dropna(subset=['site_y'])
+
+output_tenpo_match = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
+output_tenpo_match['state_cd'] = store_array_output['state_cd']
+output_tenpo_match['t_code'] = store_array_output['t_code_x']
+output_tenpo_match['ホール名'] = store_array_output['name_x']
+output_tenpo_match['address'] = store_array_output['address_x']
+output_tenpo_match['access'] = store_array_output['access_x']
+output_tenpo_match['closeday'] = store_array_output['closeday_x']
+output_tenpo_match['opentime'] = store_array_output['opentime_x']
+output_tenpo_match['service'] = store_array_output['service_x']
+output_tenpo_match['rate'] = store_array_output['rate_x']
+output_tenpo_match['dai'] = store_array_output['dai_x']
+output_tenpo_match['dai_p'] = store_array_output['dai_p_x']
+output_tenpo_match['dai_s'] = store_array_output['dai_s_x']
+output_tenpo_match['dai_sum'] = store_array_output['dai_sum_x']
+output_tenpo_match['parking'] = store_array_output['parking_x']
+output_tenpo_match['tel'] = store_array_output['tel_x']
+output_tenpo_match['tenpo_update'] = store_array_output['tenpo_update_x']
+output_tenpo_match['co_date'] = store_array_output['co_date_x']
+output_tenpo_match['merge_url'] = store_array_output['url_x']
+output_tenpo_match['pw_t_code'] = store_array_output['pw_t_code_x']
+output_tenpo_match['dmm_t_code'] = 'dmm_' + store_array_output['dmm_t_code_y']
+
+store_array_output_N = pd.merge(PW_store_duplicate, DM_store_duplicate, on=['clensing_title','state_cd'], how='outer')
+
+PW_store_array_output = store_array_output_N.dropna(subset=['site_x'])
+DM_store_array_output = store_array_output_N.dropna(subset=['site_y'])
 
 output_tenpo_p = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
 output_tenpo_d = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
@@ -654,59 +624,56 @@ output_tenpo_pc = output_tenpo_pc.rename(columns={'tel_x' : 'tel'})
 output_tenpo_pc = output_tenpo_pc.rename(columns={'co_date_x' : 'co_date'})
 output_tenpo_pc['dmm_t_code'] = 'dmm_' + output_tenpo_pc['dmm_t_code']
 
-output_tenpo_to_csv = pd.concat([output_tenpo_pc, output_tenpo_p,output_tenpo_d],sort=True)
+output_tenpo_to_csv = pd.concat([output_tenpo_pc, output_tenpo_match, output_tenpo_p, output_tenpo_d],sort=True)
 output_tenpo_to_csv = output_tenpo_to_csv.loc[:, ['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code']]
 
-output_tenpo_not_match = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
-output_tenpo_not_match_dm = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
 
-pair_tenpo = pd.DataFrame(columns=['t_code', 'dmm_t_code'])
-
-logging.info('==========duplicate : Output_Kisyu_Not_Match==========')
+logging.info('==========duplicate : Output_Tenpo_Not_Match==========')
 
 
-output_tenpo_not_match_pw = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
-output_tenpo_not_match_dm = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
+output_tenpo_not_match_PW = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
+output_tenpo_not_match_DM = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
 
-output_tenpo_not_match_pw['state_cd'] = PW_store_list_match['state_cd']
-output_tenpo_not_match_pw['t_code'] = PW_store_list_match['pw_t_code']
-output_tenpo_not_match_pw['ホール名'] = PW_store_list_match['name']
-output_tenpo_not_match_pw['address'] = PW_store_list_match['address']
-output_tenpo_not_match_pw['access'] = PW_store_list_match['access']
-output_tenpo_not_match_pw['closeday'] = PW_store_list_match['closeday']
-output_tenpo_not_match_pw['opentime'] = PW_store_list_match['opentime']
-output_tenpo_not_match_pw['service'] = PW_store_list_match['service']
-output_tenpo_not_match_pw['rate'] = PW_store_list_match['rate']
-output_tenpo_not_match_pw['dai'] = PW_store_list_match['dai']
-output_tenpo_not_match_pw['dai_p'] = PW_store_list_match['dai_p']
-output_tenpo_not_match_pw['dai_s'] = PW_store_list_match['dai_s']
-output_tenpo_not_match_pw['dai_sum'] = PW_store_list_match['dai_sum']
-output_tenpo_not_match_pw['parking'] = PW_store_list_match['parking']
-output_tenpo_not_match_pw['tel'] = PW_store_list_match['tel']
-output_tenpo_not_match_pw['tenpo_update'] = PW_store_list_match['tenpo_update']
-output_tenpo_not_match_pw['co_date'] = PW_store_list_match['co_date']
-output_tenpo_not_match_pw['merge_url'] = PW_store_list_match['url']
-output_tenpo_not_match_pw['pw_t_code'] = PW_store_list_match['pw_t_code']
+output_tenpo_not_match_PW['state_cd'] = PW_store_list_match['state_cd']
+output_tenpo_not_match_PW['t_code'] = PW_store_list_match['pw_t_code']
+output_tenpo_not_match_PW['ホール名'] = PW_store_list_match['name']
+output_tenpo_not_match_PW['address'] = PW_store_list_match['address']
+output_tenpo_not_match_PW['access'] = PW_store_list_match['access']
+output_tenpo_not_match_PW['closeday'] = PW_store_list_match['closeday']
+output_tenpo_not_match_PW['opentime'] = PW_store_list_match['opentime']
+output_tenpo_not_match_PW['service'] = PW_store_list_match['service']
+output_tenpo_not_match_PW['rate'] = PW_store_list_match['rate']
+output_tenpo_not_match_PW['dai'] = PW_store_list_match['dai']
+output_tenpo_not_match_PW['dai_p'] = PW_store_list_match['dai_p']
+output_tenpo_not_match_PW['dai_s'] = PW_store_list_match['dai_s']
+output_tenpo_not_match_PW['dai_sum'] = PW_store_list_match['dai_sum']
+output_tenpo_not_match_PW['parking'] = PW_store_list_match['parking']
+output_tenpo_not_match_PW['tel'] = PW_store_list_match['tel']
+output_tenpo_not_match_PW['tenpo_update'] = PW_store_list_match['tenpo_update']
+output_tenpo_not_match_PW['co_date'] = PW_store_list_match['co_date']
+output_tenpo_not_match_PW['merge_url'] = PW_store_list_match['url']
+output_tenpo_not_match_PW['pw_t_code'] = PW_store_list_match['pw_t_code']
 
-output_tenpo_not_match_dm['state_cd'] = DM_store_list_match['state_cd']
-output_tenpo_not_match_dm['t_code'] = DM_store_list_match['t_code']
-output_tenpo_not_match_dm['ホール名'] = DM_store_list_match['name']
-output_tenpo_not_match_dm['address'] = DM_store_list_match['address']
-output_tenpo_not_match_dm['access'] = DM_store_list_match['access']
-output_tenpo_not_match_dm['closeday'] = DM_store_list_match['closeday']
-output_tenpo_not_match_dm['opentime'] = DM_store_list_match['opentime']
-output_tenpo_not_match_dm['service'] = DM_store_list_match['service']
-output_tenpo_not_match_dm['rate'] = DM_store_list_match['rate']
-output_tenpo_not_match_dm['dai'] = DM_store_list_match['dai']
-output_tenpo_not_match_dm['dai_p'] = DM_store_list_match['dai_p']
-output_tenpo_not_match_dm['dai_s'] = DM_store_list_match['dai_s']
-output_tenpo_not_match_dm['dai_sum'] = DM_store_list_match['dai_sum']
-output_tenpo_not_match_dm['parking'] = DM_store_list_match['parking']
-output_tenpo_not_match_dm['tel'] = DM_store_list_match['tel']
-output_tenpo_not_match_dm['co_date'] = DM_store_list_match['co_date']
-output_tenpo_not_match_dm['merge_url'] = DM_store_list_match['url']
-output_tenpo_not_match_dm['tenpo_update'] = DM_store_list_match['tenpo_update']
-output_tenpo_not_match_dm['dmm_t_code'] = DM_store_list_match['dmm_t_code']
+output_tenpo_not_match_DM['state_cd'] = DM_store_list_match['state_cd']
+output_tenpo_not_match_DM['t_code'] = DM_store_list_match['t_code']
+output_tenpo_not_match_DM['ホール名'] = DM_store_list_match['name']
+output_tenpo_not_match_DM['address'] = DM_store_list_match['address']
+output_tenpo_not_match_DM['access'] = DM_store_list_match['access']
+output_tenpo_not_match_DM['closeday'] = DM_store_list_match['closeday']
+output_tenpo_not_match_DM['opentime'] = DM_store_list_match['opentime']
+output_tenpo_not_match_DM['service'] = DM_store_list_match['service']
+output_tenpo_not_match_DM['rate'] = DM_store_list_match['rate']
+output_tenpo_not_match_DM['dai'] = DM_store_list_match['dai']
+output_tenpo_not_match_DM['dai_p'] = DM_store_list_match['dai_p']
+output_tenpo_not_match_DM['dai_s'] = DM_store_list_match['dai_s']
+output_tenpo_not_match_DM['dai_sum'] = DM_store_list_match['dai_sum']
+output_tenpo_not_match_DM['parking'] = DM_store_list_match['parking']
+output_tenpo_not_match_DM['tel'] = DM_store_list_match['tel']
+output_tenpo_not_match_DM['co_date'] = DM_store_list_match['co_date']
+output_tenpo_not_match_DM['merge_url'] = DM_store_list_match['url']
+output_tenpo_not_match_DM['tenpo_update'] = DM_store_list_match['tenpo_update']
+output_tenpo_not_match_DM['dmm_t_code'] = DM_store_list_match['dmm_t_code']
+
 
 logging.info('=================Check: Data-Check====================')
 
@@ -852,16 +819,16 @@ try:
     file_kisyu2.write(output_kisyu_not_match_DM.to_csv(index=False, encoding="utf-8"))
     file_tempo1 = sftp_connection.file('/home/y_iwano/Daito/NMatch/tenpo_DM_'+ dir_date +'.csv', "a", -1)
     file_tempo1.write("\uFEFF")
-    file_tempo1.write(output_tenpo_not_match_pw.to_csv(index=False, encoding="utf-8"))
+    file_tempo1.write(output_tenpo_not_match_PW.to_csv(index=False, encoding="utf-8"))
     file_tempo2 = sftp_connection.file('/home/y_iwano/Daito/NMatch/tenpo_PW_'+ dir_date +'.csv', "a", -1)
     file_tempo2.write("\uFEFF")
-    file_tempo2.write(output_tenpo_not_match_dm.to_csv(index=False, encoding="utf-8"))
-    file_pair_kisyu = sftp_connection.file('/home/y_iwano/Daito/Pair_data/pair_kisyu.csv', "a", -1)
-    file_pair_kisyu.write("\uFEFF")
-    file_pair_kisyu.write(output_pair_to_csv.to_csv(index=False, encoding="utf-8"))
-    file_pair_tenpo = sftp_connection.file('/home/y_iwano/Daito/Pair_data/pair_tenpo.csv', "a", -1)
-    file_pair_tenpo.write("\uFEFF")
-    file_pair_tenpo.write(output_pair.to_csv(index=False, encoding="utf-8"))
+    file_tempo2.write(output_tenpo_not_match_DM.to_csv(index=False, encoding="utf-8"))
+    # file_pair_kisyu = sftp_connection.file('/home/y_iwano/Daito/Pair_data/pair_kisyu.csv', "a", -1)
+    # file_pair_kisyu.write("\uFEFF")
+    # file_pair_kisyu.write(output_pair_to_csv.to_csv(index=False, encoding="utf-8"))
+    # file_pair_tenpo = sftp_connection.file('/home/y_iwano/Daito/Pair_data/pair_tenpo.csv', "a", -1)
+    # file_pair_tenpo.write("\uFEFF")
+    # file_pair_tenpo.write(output_pair.to_csv(index=False, encoding="utf-8"))
 finally:
     client.close()
     
