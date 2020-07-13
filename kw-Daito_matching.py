@@ -381,7 +381,6 @@ table_array_outer['num_x'] = table_array_outer['num_y'].where((table_array_outer
 table_array_outer['p_title_y'] = table_array_outer['p_title_x'].where((table_array_outer['p_title_y'] == '' ) & (table_array_outer['p_title_x'] != ''), table_array_outer['p_title_y'])
 table_array_outer['pw_t_code'] = table_array_outer['dmm_t_code'].where((table_array_outer['pw_t_code'] == '') & (table_array_outer['dmm_t_code'] != ''), table_array_outer['pw_t_code'])
 table_array_outer['co_date_x'] = table_array_outer['co_date_y'].where((table_array_outer['co_date_x'] == '' ) & (table_array_outer['co_date_y'] != ''), table_array_outer['co_date_x'])
-#table_array_outer['p_code_x'] =  table_array_outer['p_code_y'].where((table_array_outer['p_code_x'] == '' ) & (table_array_outer['p_code_y'] != ''), table_array_outer['p_code_x'])
 
 output_dai_to_csv['state_cd'] = table_array_outer['state_cd']
 output_dai_to_csv['t_code'] = table_array_outer['pw_t_code']
@@ -392,8 +391,7 @@ output_dai_to_csv['設置台数'] = table_array_outer['num_x']
 output_dai_to_csv['貸玉量'] = table_array_outer['rate']
 output_dai_to_csv['更新日付'] = table_array_outer['co_date_x']
 output_dai_to_csv = output_dai_to_csv.loc[:, ['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付']]
-output_dai_to_csv = output_dai_to_csv.drop_duplicates(subset=['t_code','pcode','貸玉量'])
-output_dai_to_csv.to_csv("c:/users/岩野 勇弥/desktop/【大都技研】/02.data/output/p_dai_○○.csv",encoding='utf_8_sig', index=False ,sep=',' , quotechar='"', quoting=csv.QUOTE_ALL)
+output_dai_to_csv = output_dai_to_csv.drop_duplicates(subset=['t_code', 'pcode', '貸玉量'])
 
 logging.info('=======================店舗データ=======================')
 logging.info('================clensing : DM_store_array=============')
@@ -671,28 +669,8 @@ output_tenpo_pc_drop_DM['pw_t_code'] = output_tenpo_pc_drop_DM['t_code']
 output_tenpo_to_csv = pd.concat([output_tenpo_pc_drop_PW ,output_tenpo_pc_drop_DM, output_tenpo_match, output_tenpo_p, output_tenpo_d],sort=True)
 
 output_tenpo_to_csv = output_tenpo_to_csv.loc[:, ['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code']]
-output_tenpo_to_csv.to_csv("c:/users/岩野 勇弥/desktop/【大都技研】/02.data/output/p_tenpo_○○.csv",encoding='utf_8_sig', index=False ,sep=',' , quotechar='"', quoting=csv.QUOTE_ALL)
-
-
-logging.info('=============duplicate : OUTPUT_DUPLICATE=============')
-
-PW_code = output_tenpo_to_csv[output_tenpo_to_csv.duplicated(subset=['t_code','state_cd'],keep=False)]
-PW_code = PW_code.sort_values('pw_t_code')
-DM_code = output_tenpo_to_csv[output_tenpo_to_csv.duplicated(subset=['dmm_t_code','state_cd'],keep=False)]
-DM_code = DM_code.sort_values('dmm_t_code')
-name = output_tenpo_to_csv[output_tenpo_to_csv.duplicated(subset='ホール名',keep=False)]
-name = name.sort_values('ホール名')
-address = output_tenpo_to_csv[output_tenpo_to_csv.duplicated(subset='address',keep=False)]
-address = address.sort_values('address')
-
-PW_code.to_csv("c:/users/岩野 勇弥/desktop/【大都技研】/02.data/output/tenpo/PW_code.csv",encoding='utf_8_sig', index=False ,sep=',' , quotechar='"', quoting=csv.QUOTE_ALL)
-DM_code.to_csv("c:/users/岩野 勇弥/desktop/【大都技研】/02.data/output/tenpo/DM_code.csv",encoding='utf_8_sig', index=False ,sep=',' , quotechar='"', quoting=csv.QUOTE_ALL)
-name.to_csv("c:/users/岩野 勇弥/desktop/【大都技研】/02.data/output/tenpo/name.csv",encoding='utf_8_sig', index=False ,sep=',' , quotechar='"', quoting=csv.QUOTE_ALL)
-address.to_csv("c:/users/岩野 勇弥/desktop/【大都技研】/02.data/output/tenpo/address.csv",encoding='utf_8_sig', index=False ,sep=',' , quotechar='"', quoting=csv.QUOTE_ALL)
-
 
 logging.info('==========duplicate : Output_Tenpo_Not_Match==========')
-
 
 output_tenpo_not_match_PW = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
 output_tenpo_not_match_DM = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
@@ -886,12 +864,6 @@ try:
     file_tempo2 = sftp_connection.file('/home/y_iwano/Daito/NMatch/tenpo_PW_'+ dir_date +'.csv', "a", -1)
     file_tempo2.write("\uFEFF")
     file_tempo2.write(output_tenpo_not_match_DM.to_csv(index=False, encoding="utf-8"))
-    # file_pair_kisyu = sftp_connection.file('/home/y_iwano/Daito/Pair_data/pair_kisyu.csv', "a", -1)
-    # file_pair_kisyu.write("\uFEFF")
-    # file_pair_kisyu.write(output_pair_to_csv.to_csv(index=False, encoding="utf-8"))
-    # file_pair_tenpo = sftp_connection.file('/home/y_iwano/Daito/Pair_data/pair_tenpo.csv', "a", -1)
-    # file_pair_tenpo.write("\uFEFF")
-    # file_pair_tenpo.write(output_pair.to_csv(index=False, encoding="utf-8"))
 finally:
     client.close()
     

@@ -42,7 +42,7 @@ metadata:
   name: python-cronjob
   namespace:  kw-daito-identity
 spec:
-  schedule: '* 6 * * 2'
+  schedule: '0 21 * * 1'
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 5
   failedJobsHistoryLimit: 5
