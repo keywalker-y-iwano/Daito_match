@@ -10,7 +10,7 @@ import logging
 import requests
 from decimal import Decimal, ROUND_HALF_UP
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logging.info('=========================start========================')
 def mail_gun(text):
     files = {
