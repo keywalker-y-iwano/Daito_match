@@ -323,7 +323,8 @@ mem = psutil.virtual_memory()
 logging.info('Used_memory:' + mem.used)
 
 logging.info('=========================台データ=======================')
-logging.info('================clensing : DM_table_array=============')
+logging.info('================clensing : DM_table_array==============')
+
 
 DM_table_array_clensing = DM_table_array.copy()
 DM_table_array_clensing['clensing_title'] = ''
@@ -338,6 +339,10 @@ DM_table_array_clensing['rate_list'] = DM_table_array_clensing['rate'].str.split
 DM_table_array_clensing['rate'] = DM_table_array_clensing['rate_list'].apply(calc_rate)
 DM_table_array_clensing['co_date'] = date
 DM_table_array_clensing = DM_table_array_clensing.drop('rate_list', axis=1)
+
+mem = psutil.virtual_memory()
+logging.info('Used_memory:' + mem.used)
+logging.info('============================1==========================')
 
 DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['p_title'].fillna('')
 DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].apply(moji.zen_to_han)
@@ -367,6 +372,10 @@ PW_table_array_clensing['rate'] = PW_table_array_clensing['rate_list'].apply(cal
 PW_table_array_clensing['co_date'] = date
 PW_table_array_clensing = PW_table_array_clensing.drop('rate_list', axis=1)
 
+mem = psutil.virtual_memory()
+logging.info('Used_memory:' + mem.used)
+logging.info('============================2==========================')
+
 PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['p_title'].fillna('')
 PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].apply(moji.zen_to_han)
 PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.replace(' ','').str.replace('Ⅰ','I').str.replace('Ⅱ','II').str.replace('Ⅲ','III').str.replace('Ⅳ','IV').str.replace('Ⅴ','V').str.replace('Ⅵ','VI').str.replace('Ⅶ','VII').str.replace('Ⅷ','VIII').str.replace('Ⅸ','IX').str.replace('Ⅹ','X')
@@ -394,6 +403,10 @@ table_array_outer['num_y'] = table_array_outer['num_y'].fillna(0)
 table_array_outer['num_x'] = table_array_outer['num_x'].astype('int64')
 table_array_outer['num_y'] = table_array_outer['num_y'].astype('int64')
 
+mem = psutil.virtual_memory()
+logging.info('Used_memory:' + mem.used)
+logging.info('============================3==========================')
+
 table_array_outer['p_title_x'] = table_array_outer['p_title_x'].fillna('')
 table_array_outer['p_title_y'] = table_array_outer['p_title_y'].fillna('')
 table_array_outer['pw_t_code'] = table_array_outer['pw_t_code'].fillna('')
@@ -403,11 +416,19 @@ table_array_outer['co_date_y'] = table_array_outer['co_date_y'].fillna('')
 table_array_outer['p_code_x'] = table_array_outer['p_code_x'].fillna('')
 table_array_outer['p_code_y'] = table_array_outer['p_code_y'].fillna('')
 
+mem = psutil.virtual_memory()
+logging.info('Used_memory:' + mem.used)
+logging.info('============================4==========================')
+
 table_array_outer['dmm_t_code'] = table_array_outer['dmm_t_code'].where((table_array_outer['dmm_t_code'] == ''), ('dmm_' + table_array_outer['dmm_t_code']))
 table_array_outer['num_x'] = table_array_outer['num_y'].where((table_array_outer['num_x'] == 0) & (table_array_outer['num_y'] != 0 ), table_array_outer['num_x'])
 table_array_outer['p_title_y'] = table_array_outer['p_title_x'].where((table_array_outer['p_title_y'] == '' ) & (table_array_outer['p_title_x'] != ''), table_array_outer['p_title_y'])
 table_array_outer['pw_t_code'] = table_array_outer['dmm_t_code'].where((table_array_outer['pw_t_code'] == '') & (table_array_outer['dmm_t_code'] != ''), table_array_outer['pw_t_code'])
 table_array_outer['co_date_x'] = table_array_outer['co_date_y'].where((table_array_outer['co_date_x'] == '' ) & (table_array_outer['co_date_y'] != ''), table_array_outer['co_date_x'])
+
+mem = psutil.virtual_memory()
+logging.info('Used_memory:' + mem.used)
+logging.info('============================5==========================')
 
 output_dai_to_csv['state_cd'] = table_array_outer['state_cd']
 output_dai_to_csv['t_code'] = table_array_outer['pw_t_code']
