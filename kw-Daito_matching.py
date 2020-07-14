@@ -10,7 +10,7 @@ import logging
 import requests
 from decimal import Decimal, ROUND_HALF_UP
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logging.info('=========================start========================')
 def mail_gun(text):
     files = {
@@ -211,8 +211,8 @@ DM_model_array_clensing['clensing_title'] = DM_model_array_clensing['clensing_ti
 DM_model_array_clensing['clensing_title'] = DM_model_array_clensing['clensing_title'].str.replace('‐','').str.replace('｢','').str.replace('｣','').str.replace('･','').str.replace('〜','').str.replace('【','').str.replace('】','').str.replace('‐','')
 DM_model_array_clensing['d_date'] = DM_model_array_clensing['info5'].apply(delete_brackets)
 DM_model_array_clensing['s_date'] = DM_model_array_clensing['d_date'].apply(moji.zen_to_han)
+DM_model_array_clensing['s_date'] = DM_model_array_clensing['s_date'].fillna('')
 DM_model_array_clensing['s_date'] = DM_model_array_clensing['s_date'].apply(delete_brackets)
-DM_model_array_clensing['s_date'] = ''
 DM_model_array_clensing['s_date'] = DM_model_array_clensing['s_date'].str.replace('上旬予定','').str.replace('予定','')
 DM_model_array_clensing['s_date'] = DM_model_array_clensing['s_date'].apply(add_zero)
 DM_model_array_clensing['info1'] = DM_model_array_clensing['info1'].str.replace('件','').str.replace('（','').str.replace('）','').str.replace('(','').str.replace(')','')
@@ -229,6 +229,7 @@ PW_model_array_clensing['clensing_title'] = PW_model_array_clensing['clensing_ti
 PW_model_array_clensing['clensing_title'] = PW_model_array_clensing['clensing_title'].str.translate(str.maketrans( '', '',string.punctuation))
 PW_model_array_clensing['clensing_title'] = PW_model_array_clensing['clensing_title'].str.replace('‐','').str.replace('｢','').str.replace('｣','').str.replace('･','').str.replace('〜','').str.replace('【','').str.replace('】','').str.replace('‐','')
 PW_model_array_clensing['d_date'] = PW_model_array_clensing['d_date'].str.replace('導入開始：','')
+PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].fillna('')
 PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].str.replace('調査日：','')
 PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].str.replace('上旬','').str.replace('下旬','').str.replace('予定','')
 PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].apply(add_zero)
