@@ -10,6 +10,7 @@ import logging
 import requests
 from decimal import Decimal, ROUND_HALF_UP
 import psutil
+import gc
 
 logging.basicConfig(level=logging.INFO)
 logging.info('=========================start========================')
@@ -251,6 +252,8 @@ mem = psutil.virtual_memory()
 print(mem.used)
 
 DM_model_array_merge = pd.merge(DM_model_array_clensing, model_pair_array, on='dmm_pcode', how='left')
+del DM_model_array_clensing
+gc.collect()
 DM_model_array_merge = DM_model_array_merge.drop_duplicates(subset=['title','P_S'])
 PW_model_array_merge = pd.merge(PW_model_array_clensing, model_pair_array, on='pw_pcode', how='left')
 PW_model_array_merge = PW_model_array_merge.drop_duplicates(subset=['title','P_S'])
@@ -318,111 +321,14 @@ output_kisyu_not_match_DM['dmm_pcode'] = 'dmm_' + DM_model_not_match['dmm_pcode'
 output_kisyu_not_match_DM['機種名'] = DM_model_not_match['title_y']
 output_kisyu_not_match_DM['Ｐ／Ｓ区分'] = DM_model_not_match['P_S']
 
-logging.info('=========================台データ=======================')
-logging.info('================clensing : DM_table_array=============')
-mem = psutil.virtual_memory()
-print(mem.used)
-
-DM_table_array_clensing = DM_table_array.copy()
-DM_table_array_clensing['clensing_title'] = ''
-DM_table_array_clensing['co_date'] = ''
-
-DM_table_array_clensing['p_code'] = 'dmm_' + DM_table_array_clensing['p_code']
-DM_table_array_clensing['num'] = DM_table_array_clensing['num'].str.replace('台','')
-DM_table_array_clensing['rate'] = DM_table_array_clensing['rate'].apply(moji.zen_to_han)
-DM_table_array_clensing['rate'] = DM_table_array_clensing['rate'].str.replace(' ','').str.replace('台','').str.replace('S','').str.replace('[','').str.replace('金額','').str.replace(']','').str.replace('【','').str.replace('】','').str.replace('円','').str.replace('し','').str.replace('貸','').str.replace('玉','').str.replace('枚','').str.replace('ﾊﾟﾁ','').str.replace('ﾝｺ','').str.replace('ｽﾛ','').str.replace('ｯﾄ','').str.replace('貸しS','').str.replace('しS','').str.replace('¥','').str.replace('ﾗﾌｪ⑤','').str.replace('ﾗﾌｪ','').str.replace('②','').str.replace('⓻','').str.replace(',','').str.replace('ｲﾁ','').str.replace('甘ﾃﾞｼﾞ･羽根物','').str.replace('ぱち','').str.replace('ﾐﾄﾞﾙ･ﾗｲﾄ','')
-DM_table_array_clensing['rate'] = DM_table_array_clensing['rate'].str.replace('=','/').str.replace('‐','/').str.replace(':','/').str.replace('階','/')
-DM_table_array_clensing['rate_list'] = DM_table_array_clensing['rate'].str.split('/')
-DM_table_array_clensing['rate'] = DM_table_array_clensing['rate_list'].apply(calc_rate)
-DM_table_array_clensing['co_date'] = date
-DM_table_array_clensing = DM_table_array_clensing.drop('rate_list', axis=1)
-
-DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['p_title'].fillna('')
-DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].apply(moji.zen_to_han)
-DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].str.replace(' ','').str.replace('Ⅰ','I').str.replace('Ⅱ','II').str.replace('Ⅲ','III').str.replace('Ⅳ','IV').str.replace('Ⅴ','V').str.replace('Ⅵ','VI').str.replace('Ⅶ','VII').str.replace('Ⅷ','VIII').str.replace('Ⅸ','IX').str.replace('Ⅹ','X')
-DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].str.lower()
-DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].str.translate(str.maketrans( '', '',string.punctuation))
-DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].str.replace('‐','').str.replace('｢','').str.replace('｣','').str.replace('〜','').str.replace('【','').str.replace('】','').str.replace('☆','').str.replace('†','').str.replace('…','')
-DM_table_array_clensing['site'] = 1
-
-logging.info('===============clensing : PW_table_array==============')
-mem = psutil.virtual_memory()
-print(mem.used)
-
-PW_table_array_clensing = PW_table_array.copy()
-PW_table_array_clensing['clensing_title'] = ''
-PW_table_array_clensing['co_date'] = ''
-
-PW_table_array_clensing['p_code'] = 'p' + PW_table_array_clensing['p_code']
-PW_table_array_clensing['num'] = PW_table_array_clensing['num'].str.replace('台','')
-PW_table_array_clensing['pw_t_code'] = PW_table_array_clensing['pw_t_code'].str.replace('.htm','')
-PW_table_array_clensing['rate'] = PW_table_array_clensing['rate'].fillna('')
-PW_table_array_clensing['rate'] = PW_table_array_clensing['rate'].apply(moji.zen_to_han)
-PW_table_array_clensing['rate'] = PW_table_array_clensing['rate'].str.replace(' ','').str.replace('[','').str.replace(']','').str.replace('【','').str.replace('】','').str.replace('円','').str.replace('貸','').str.replace('玉','').str.replace('枚','').str.replace('ﾊﾟﾁ','').str.replace('ﾝｺ','').str.replace('ｽﾛ','').str.replace('ｯﾄ','').str.replace('貸しS','').str.replace('しS','').str.replace('¥','').str.replace('ﾗﾌｪ⑤','').str.replace('ﾗﾌｪ','').str.replace('②','').str.replace('⓻','').str.replace(',','')
-PW_table_array_clensing['rate_list'] = PW_table_array_clensing['rate'].str.split('/')
-PW_table_array_clensing['rate'] = PW_table_array_clensing['rate_list'].apply(calc_rate)
-PW_table_array_clensing['co_date'] = date
-PW_table_array_clensing = PW_table_array_clensing.drop('rate_list', axis=1)
-
-PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['p_title'].fillna('')
-PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].apply(moji.zen_to_han)
-PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.replace(' ','').str.replace('Ⅰ','I').str.replace('Ⅱ','II').str.replace('Ⅲ','III').str.replace('Ⅳ','IV').str.replace('Ⅴ','V').str.replace('Ⅵ','VI').str.replace('Ⅶ','VII').str.replace('Ⅷ','VIII').str.replace('Ⅸ','IX').str.replace('Ⅹ','X')
-PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.lower()
-PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.translate(str.maketrans( '', '',string.punctuation))
-PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.replace('‐','').str.replace('｢','').str.replace('｣','').str.replace('〜','').str.replace('【','').str.replace('】','').str.replace('☆','').str.replace('†','').str.replace('…','')
-PW_table_array_clensing['site'] = 0
-
-logging.info('==================marge : table_array=================')
-mem = psutil.virtual_memory()
-print(mem.used)
-
-output_dai_to_csv = pd.DataFrame(columns=['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付'])
-table_array_outer = pd.merge(PW_table_array_clensing, DM_table_array_clensing, on=['clensing_title', 'rate', 'state_cd'], how='outer')
-
-table_array_outer['num_x'] = table_array_outer['num_x'].str.replace('#NAME?','0')
-table_array_outer['num_y'] = table_array_outer['num_y'].str.replace('#NAME?','0')
-table_array_outer['num_x'] = table_array_outer['num_x'].str.replace('?','')
-table_array_outer['num_y'] = table_array_outer['num_y'].str.replace('?','')
-table_array_outer['num_x'] = table_array_outer['num_x'].str.replace('-','0')
-table_array_outer['num_y'] = table_array_outer['num_y'].str.replace('-','0')
-table_array_outer['num_x'] = table_array_outer['num_x'].fillna(0)
-table_array_outer['num_y'] = table_array_outer['num_y'].fillna(0)
-table_array_outer['num_x'] = table_array_outer['num_x'].astype('int64')
-table_array_outer['num_y'] = table_array_outer['num_y'].astype('int64')
-
-table_array_outer['p_title_x'] = table_array_outer['p_title_x'].fillna('')
-table_array_outer['p_title_y'] = table_array_outer['p_title_y'].fillna('')
-table_array_outer['pw_t_code'] = table_array_outer['pw_t_code'].fillna('')
-table_array_outer['dmm_t_code'] = table_array_outer['dmm_t_code'].fillna('')
-table_array_outer['co_date_x'] = table_array_outer['co_date_x'].fillna('')
-table_array_outer['co_date_y'] = table_array_outer['co_date_y'].fillna('')
-table_array_outer['p_code_x'] = table_array_outer['p_code_x'].fillna('')
-table_array_outer['p_code_y'] = table_array_outer['p_code_y'].fillna('')
-
-table_array_outer['dmm_t_code'] = table_array_outer['dmm_t_code'].where((table_array_outer['dmm_t_code'] == ''), ('dmm_' + table_array_outer['dmm_t_code']))
-table_array_outer['num_x'] = table_array_outer['num_y'].where((table_array_outer['num_x'] == 0) & (table_array_outer['num_y'] != 0 ), table_array_outer['num_x'])
-table_array_outer['p_title_y'] = table_array_outer['p_title_x'].where((table_array_outer['p_title_y'] == '' ) & (table_array_outer['p_title_x'] != ''), table_array_outer['p_title_y'])
-table_array_outer['pw_t_code'] = table_array_outer['dmm_t_code'].where((table_array_outer['pw_t_code'] == '') & (table_array_outer['dmm_t_code'] != ''), table_array_outer['pw_t_code'])
-table_array_outer['co_date_x'] = table_array_outer['co_date_y'].where((table_array_outer['co_date_x'] == '' ) & (table_array_outer['co_date_y'] != ''), table_array_outer['co_date_x'])
-#table_array_outer['p_code_x'] =  table_array_outer['p_code_y'].where((table_array_outer['p_code_x'] == '' ) & (table_array_outer['p_code_y'] != ''), table_array_outer['p_code_x'])
-
-output_dai_to_csv['state_cd'] = table_array_outer['state_cd']
-output_dai_to_csv['t_code'] = table_array_outer['pw_t_code']
-output_dai_to_csv['pcode'] = table_array_outer['p_code_x']
-output_dai_to_csv['正式機種名'] = table_array_outer['p_title_x']
-output_dai_to_csv['機種名(店舗入力名)'] = table_array_outer['p_title_y']
-output_dai_to_csv['設置台数'] = table_array_outer['num_x']
-output_dai_to_csv['貸玉量'] = table_array_outer['rate']
-output_dai_to_csv['更新日付'] = table_array_outer['co_date_x']
-output_dai_to_csv = output_dai_to_csv.loc[:, ['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付']]
-output_dai_to_csv = output_dai_to_csv.drop_duplicates(subset=['t_code','pcode','貸玉量'])
-
 logging.info('=======================店舗データ=======================')
 logging.info('================clensing : DM_store_array=============')
 mem = psutil.virtual_memory()
 print(mem.used)
 
 DM_store_array_clensing = DM_store_array.copy()
+del DM_store_array
+gc.collect()
 DM_store_array_clensing['clensing_title'] = ''
 DM_store_array_clensing['address'] = ''
 DM_store_array_clensing['address'] = DM_store_array_clensing['adress']
@@ -459,6 +365,8 @@ mem = psutil.virtual_memory()
 print(mem.used)
 
 PW_store_array_clensing = PW_store_array.copy()
+del PW_store_array
+gc.collect()
 PW_store_array_clensing['clensing_title'] = ''
 PW_store_array_clensing['address'] = ''
 PW_store_array_clensing['address'] = PW_store_array_clensing['adress']
@@ -495,8 +403,11 @@ store_pair_array['dmm_t_code'] = 'dmm_' + store_pair_array['dmm_t_code']
 DM_store_array_merge = pd.merge(DM_store_array_clensing, store_pair_array, on=['state_cd','dmm_t_code'], how='inner')
 DM_store_array_merge_drop_PW = DM_store_array_merge.dropna(subset=['pw_t_code_y'])
 DM_store_array_merge_drop_PW['t_code'] = DM_store_array_merge_drop_PW['pw_t_code_y']
+del DM_store_array_merge
+gc.collect()
 
 PW_store_array_merge = pd.merge(PW_store_array_clensing, store_pair_array, on=['state_cd','pw_t_code'], how='inner')
+
 PW_store_array_merge_drop_DM = PW_store_array_merge.dropna(subset=['dmm_t_code_y'])
 
 
@@ -561,6 +472,8 @@ store_list_innerp['比較用の列'] = store_list_innerp.apply(lambda x: '{}_{}'
 PW_store_array_clensing['比較用の列'] = PW_store_array_clensing.apply(lambda x: '{}_{}'.format(x[1], x[27]), axis=1)
 PW_store_list_match = PW_store_array_clensing[~PW_store_array_clensing['比較用の列'].isin(store_list_innerp['比較用の列'])]
 PW_store_duplicate = PW_store_list_match
+del PW_store_array_clensing
+gc.collect()
 
 store_list_inner = pd.merge(DM_store_array_clensing, output_tenpo_pc, on='dmm_t_code', how='inner')
 store_list_inner['比較用の列'] = store_list_inner.apply(lambda x: '{}_{}'.format(x[1], x[27]), axis=1)
@@ -568,6 +481,8 @@ store_list_inner['比較用の列'] = store_list_inner.apply(lambda x: '{}_{}'.f
 DM_store_array_clensing['比較用の列'] = DM_store_array_clensing.apply(lambda x: '{}_{}'.format(x[1], x[27]), axis=1)
 DM_store_list_match = DM_store_array_clensing[~DM_store_array_clensing['比較用の列'].isin(store_list_inner['比較用の列'])]
 DM_store_duplicate = DM_store_list_match
+del DM_store_array_clensing
+gc.collect()
 
 store_array_output = pd.merge(PW_store_duplicate, DM_store_duplicate, on=['clensing_title','state_cd'], how='inner')
 
@@ -594,8 +509,15 @@ output_tenpo_match['merge_url'] = store_array_output['url_x']
 output_tenpo_match['pw_t_code'] = store_array_output['pw_t_code_x']
 output_tenpo_match['dmm_t_code'] = store_array_output['dmm_t_code_y']
 
+del store_array_output
+gc.collect()
+
 store_array_output_N_outer = pd.merge(PW_store_duplicate, DM_store_duplicate, on=['clensing_title','state_cd'], how='outer')
 store_array_output_N_inner = pd.merge(PW_store_duplicate, DM_store_duplicate, on=['clensing_title','state_cd'], how='inner')
+
+del DM_store_duplicate
+del PW_store_duplicate
+gc.collect()
 
 store_array_output_N_outer['比較用の列'] = store_array_output_N_outer.apply(lambda x: '{}_{}'.format(x[1], x[27]), axis=1)
 store_array_output_N_inner['比較用の列'] = store_array_output_N_inner.apply(lambda x: '{}_{}'.format(x[1], x[27]), axis=1)
@@ -761,6 +683,116 @@ output_tenpo_not_match_DM['co_date'] = DM_store_list_match['co_date']
 output_tenpo_not_match_DM['merge_url'] = DM_store_list_match['url']
 output_tenpo_not_match_DM['tenpo_update'] = DM_store_list_match['tenpo_update']
 output_tenpo_not_match_DM['dmm_t_code'] = DM_store_list_match['dmm_t_code']
+
+logging.info('=========================台データ=======================')
+logging.info('================clensing : DM_table_array=============')
+mem = psutil.virtual_memory()
+print(mem.used)
+
+DM_table_array_clensing = DM_table_array.copy()
+del DM_table_array
+gc.collect()
+DM_table_array_clensing['clensing_title'] = ''
+DM_table_array_clensing['co_date'] = ''
+
+DM_table_array_clensing['p_code'] = 'dmm_' + DM_table_array_clensing['p_code']
+DM_table_array_clensing['num'] = DM_table_array_clensing['num'].str.replace('台','')
+DM_table_array_clensing['rate'] = DM_table_array_clensing['rate'].apply(moji.zen_to_han)
+DM_table_array_clensing['rate'] = DM_table_array_clensing['rate'].str.replace(' ','').str.replace('台','').str.replace('S','').str.replace('[','').str.replace('金額','').str.replace(']','').str.replace('【','').str.replace('】','').str.replace('円','').str.replace('し','').str.replace('貸','').str.replace('玉','').str.replace('枚','').str.replace('ﾊﾟﾁ','').str.replace('ﾝｺ','').str.replace('ｽﾛ','').str.replace('ｯﾄ','').str.replace('貸しS','').str.replace('しS','').str.replace('¥','').str.replace('ﾗﾌｪ⑤','').str.replace('ﾗﾌｪ','').str.replace('②','').str.replace('⓻','').str.replace(',','').str.replace('ｲﾁ','').str.replace('甘ﾃﾞｼﾞ･羽根物','').str.replace('ぱち','').str.replace('ﾐﾄﾞﾙ･ﾗｲﾄ','')
+DM_table_array_clensing['rate'] = DM_table_array_clensing['rate'].str.replace('=','/').str.replace('‐','/').str.replace(':','/').str.replace('階','/')
+DM_table_array_clensing['rate_list'] = DM_table_array_clensing['rate'].str.split('/')
+DM_table_array_clensing['rate'] = DM_table_array_clensing['rate_list'].apply(calc_rate)
+DM_table_array_clensing['co_date'] = date
+DM_table_array_clensing = DM_table_array_clensing.drop('rate_list', axis=1)
+
+DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['p_title'].fillna('')
+DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].apply(moji.zen_to_han)
+DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].str.replace(' ','').str.replace('Ⅰ','I').str.replace('Ⅱ','II').str.replace('Ⅲ','III').str.replace('Ⅳ','IV').str.replace('Ⅴ','V').str.replace('Ⅵ','VI').str.replace('Ⅶ','VII').str.replace('Ⅷ','VIII').str.replace('Ⅸ','IX').str.replace('Ⅹ','X')
+DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].str.lower()
+DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].str.translate(str.maketrans( '', '',string.punctuation))
+DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].str.replace('‐','').str.replace('｢','').str.replace('｣','').str.replace('〜','').str.replace('【','').str.replace('】','').str.replace('☆','').str.replace('†','').str.replace('…','')
+DM_table_array_clensing['site'] = 1
+
+logging.info('===============clensing : PW_table_array==============')
+mem = psutil.virtual_memory()
+print(mem.used)
+
+PW_table_array_clensing = PW_table_array.copy()
+del PW_table_array
+gc.collect()
+PW_table_array_clensing['clensing_title'] = ''
+PW_table_array_clensing['co_date'] = ''
+
+PW_table_array_clensing['p_code'] = 'p' + PW_table_array_clensing['p_code']
+PW_table_array_clensing['num'] = PW_table_array_clensing['num'].str.replace('台','')
+PW_table_array_clensing['pw_t_code'] = PW_table_array_clensing['pw_t_code'].str.replace('.htm','')
+PW_table_array_clensing['rate'] = PW_table_array_clensing['rate'].fillna('')
+PW_table_array_clensing['rate'] = PW_table_array_clensing['rate'].apply(moji.zen_to_han)
+PW_table_array_clensing['rate'] = PW_table_array_clensing['rate'].str.replace(' ','').str.replace('[','').str.replace(']','').str.replace('【','').str.replace('】','').str.replace('円','').str.replace('貸','').str.replace('玉','').str.replace('枚','').str.replace('ﾊﾟﾁ','').str.replace('ﾝｺ','').str.replace('ｽﾛ','').str.replace('ｯﾄ','').str.replace('貸しS','').str.replace('しS','').str.replace('¥','').str.replace('ﾗﾌｪ⑤','').str.replace('ﾗﾌｪ','').str.replace('②','').str.replace('⓻','').str.replace(',','')
+PW_table_array_clensing['rate_list'] = PW_table_array_clensing['rate'].str.split('/')
+PW_table_array_clensing['rate'] = PW_table_array_clensing['rate_list'].apply(calc_rate)
+PW_table_array_clensing['co_date'] = date
+PW_table_array_clensing = PW_table_array_clensing.drop('rate_list', axis=1)
+
+PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['p_title'].fillna('')
+PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].apply(moji.zen_to_han)
+PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.replace(' ','').str.replace('Ⅰ','I').str.replace('Ⅱ','II').str.replace('Ⅲ','III').str.replace('Ⅳ','IV').str.replace('Ⅴ','V').str.replace('Ⅵ','VI').str.replace('Ⅶ','VII').str.replace('Ⅷ','VIII').str.replace('Ⅸ','IX').str.replace('Ⅹ','X')
+PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.lower()
+PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.translate(str.maketrans( '', '',string.punctuation))
+PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.replace('‐','').str.replace('｢','').str.replace('｣','').str.replace('〜','').str.replace('【','').str.replace('】','').str.replace('☆','').str.replace('†','').str.replace('…','')
+PW_table_array_clensing['site'] = 0
+
+logging.info('==================marge : table_array=================')
+mem = psutil.virtual_memory()
+print(mem.used)
+
+output_dai_to_csv = pd.DataFrame(columns=['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付'])
+table_array_outer = pd.merge(PW_table_array_clensing, DM_table_array_clensing, on=['clensing_title', 'rate', 'state_cd'], how='outer',copy=False)
+del PW_table_array_clensing
+del DM_table_array_clensing
+gc.collect()
+
+table_array_outer['num_x'] = table_array_outer['num_x'].str.replace('#NAME?','0')
+table_array_outer['num_y'] = table_array_outer['num_y'].str.replace('#NAME?','0')
+table_array_outer['num_x'] = table_array_outer['num_x'].str.replace('?','')
+table_array_outer['num_y'] = table_array_outer['num_y'].str.replace('?','')
+table_array_outer['num_x'] = table_array_outer['num_x'].str.replace('-','0')
+table_array_outer['num_y'] = table_array_outer['num_y'].str.replace('-','0')
+table_array_outer['num_x'] = table_array_outer['num_x'].fillna(0)
+table_array_outer['num_y'] = table_array_outer['num_y'].fillna(0)
+table_array_outer['num_x'] = table_array_outer['num_x'].astype('int64')
+table_array_outer['num_y'] = table_array_outer['num_y'].astype('int64')
+
+table_array_outer['p_title_x'] = table_array_outer['p_title_x'].fillna('')
+table_array_outer['p_title_y'] = table_array_outer['p_title_y'].fillna('')
+table_array_outer['pw_t_code'] = table_array_outer['pw_t_code'].fillna('')
+table_array_outer['dmm_t_code'] = table_array_outer['dmm_t_code'].fillna('')
+table_array_outer['co_date_x'] = table_array_outer['co_date_x'].fillna('')
+table_array_outer['co_date_y'] = table_array_outer['co_date_y'].fillna('')
+table_array_outer['p_code_x'] = table_array_outer['p_code_x'].fillna('')
+table_array_outer['p_code_y'] = table_array_outer['p_code_y'].fillna('')
+
+
+table_array_outer['dmm_t_code'] = table_array_outer['dmm_t_code'].where((table_array_outer['dmm_t_code'] == ''), ('dmm_' + table_array_outer['dmm_t_code']))
+table_array_outer['num_x'] = table_array_outer['num_y'].where((table_array_outer['num_x'] == 0) & (table_array_outer['num_y'] != 0 ), table_array_outer['num_x'])
+table_array_outer['p_title_y'] = table_array_outer['p_title_x'].where((table_array_outer['p_title_y'] == '' ) & (table_array_outer['p_title_x'] != ''), table_array_outer['p_title_y'])
+table_array_outer['pw_t_code'] = table_array_outer['dmm_t_code'].where((table_array_outer['pw_t_code'] == '') & (table_array_outer['dmm_t_code'] != ''), table_array_outer['pw_t_code'])
+table_array_outer['co_date_x'] = table_array_outer['co_date_y'].where((table_array_outer['co_date_x'] == '' ) & (table_array_outer['co_date_y'] != ''), table_array_outer['co_date_x'])
+#table_array_outer['p_code_x'] =  table_array_outer['p_code_y'].where((table_array_outer['p_code_x'] == '' ) & (table_array_outer['p_code_y'] != ''), table_array_outer['p_code_x'])
+
+output_dai_to_csv['state_cd'] = table_array_outer['state_cd']
+output_dai_to_csv['t_code'] = table_array_outer['pw_t_code']
+output_dai_to_csv['pcode'] = table_array_outer['p_code_x']
+output_dai_to_csv['正式機種名'] = table_array_outer['p_title_x']
+output_dai_to_csv['機種名(店舗入力名)'] = table_array_outer['p_title_y']
+output_dai_to_csv['設置台数'] = table_array_outer['num_x']
+output_dai_to_csv['貸玉量'] = table_array_outer['rate']
+output_dai_to_csv['更新日付'] = table_array_outer['co_date_x']
+
+del table_array_outer
+gc.collect()
+output_dai_to_csv = output_dai_to_csv.loc[:, ['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付']]
+output_dai_to_csv = output_dai_to_csv.drop_duplicates(subset=['t_code','pcode','貸玉量'])
 
 mem = psutil.virtual_memory()
 logging.info('Used_memory:' + str(mem.used))
