@@ -205,6 +205,8 @@ logging.info('Used_memory:' + str(mem.used))
 
 logging.info('=======================機種データ=======================')
 logging.info('===============clensing : DM_model_array==============')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 DM_model_array_clensing = DM_model_array.copy()
 DM_model_array_clensing['clensing_title'] = ''
@@ -226,10 +228,9 @@ DM_model_array_clensing['info1'] = DM_model_array_clensing['info1'].str.replace(
 DM_model_array_clensing['site'] = 1
 DM_model_array_clensing = DM_model_array_clensing.drop_duplicates(subset=['clensing_title','P_S'])
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-
 logging.info('===============clensing : PW_model_array==============')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 PW_model_array_clensing = PW_model_array.copy()
 PW_model_array_clensing['clensing_title'] = ''
@@ -245,10 +246,9 @@ PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].str.replac
 PW_model_array_clensing['s_date'] = PW_model_array_clensing['s_date'].apply(add_zero)
 PW_model_array_clensing['site'] = 0
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-
 logging.info('===================check: model_list==================')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 DM_model_array_merge = pd.merge(DM_model_array_clensing, model_pair_array, on='dmm_pcode', how='left')
 DM_model_array_merge = DM_model_array_merge.drop_duplicates(subset=['title','P_S'])
@@ -294,10 +294,9 @@ output_kisyu_to_csv['dmm_pcode'] = 'dmm_' + model_array_merge['dmm_pcode']
 output_kisyu_to_csv_temp = output_kisyu_to_csv
 output_kisyu_to_csv = output_kisyu_to_csv.drop_duplicates(subset=['機種名','pcode'])
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-
 logging.info('==========duplicate : output_kisyu_not_match==========')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 model_output_array_inner = pd.merge(PW_model_array_merge, DM_model_array_merge, on=['clensing_title','P_S'], how='inner')
 model_output_array_outer = pd.merge(PW_model_array_merge, DM_model_array_merge, on=['clensing_title','P_S'], how='outer')
@@ -319,12 +318,10 @@ output_kisyu_not_match_DM['dmm_pcode'] = 'dmm_' + DM_model_not_match['dmm_pcode'
 output_kisyu_not_match_DM['機種名'] = DM_model_not_match['title_y']
 output_kisyu_not_match_DM['Ｐ／Ｓ区分'] = DM_model_not_match['P_S']
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-
 logging.info('=========================台データ=======================')
-logging.info('================clensing : DM_table_array==============')
-
+logging.info('================clensing : DM_table_array=============')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 DM_table_array_clensing = DM_table_array.copy()
 DM_table_array_clensing['clensing_title'] = ''
@@ -340,10 +337,6 @@ DM_table_array_clensing['rate'] = DM_table_array_clensing['rate_list'].apply(cal
 DM_table_array_clensing['co_date'] = date
 DM_table_array_clensing = DM_table_array_clensing.drop('rate_list', axis=1)
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-logging.info('============================1==========================')
-
 DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['p_title'].fillna('')
 DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].apply(moji.zen_to_han)
 DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].str.replace(' ','').str.replace('Ⅰ','I').str.replace('Ⅱ','II').str.replace('Ⅲ','III').str.replace('Ⅳ','IV').str.replace('Ⅴ','V').str.replace('Ⅵ','VI').str.replace('Ⅶ','VII').str.replace('Ⅷ','VIII').str.replace('Ⅸ','IX').str.replace('Ⅹ','X')
@@ -352,10 +345,9 @@ DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_ti
 DM_table_array_clensing['clensing_title'] = DM_table_array_clensing['clensing_title'].str.replace('‐','').str.replace('｢','').str.replace('｣','').str.replace('〜','').str.replace('【','').str.replace('】','').str.replace('☆','').str.replace('†','').str.replace('…','')
 DM_table_array_clensing['site'] = 1
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-
 logging.info('===============clensing : PW_table_array==============')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 PW_table_array_clensing = PW_table_array.copy()
 PW_table_array_clensing['clensing_title'] = ''
@@ -372,10 +364,6 @@ PW_table_array_clensing['rate'] = PW_table_array_clensing['rate_list'].apply(cal
 PW_table_array_clensing['co_date'] = date
 PW_table_array_clensing = PW_table_array_clensing.drop('rate_list', axis=1)
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-logging.info('============================2==========================')
-
 PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['p_title'].fillna('')
 PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].apply(moji.zen_to_han)
 PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.replace(' ','').str.replace('Ⅰ','I').str.replace('Ⅱ','II').str.replace('Ⅲ','III').str.replace('Ⅳ','IV').str.replace('Ⅴ','V').str.replace('Ⅵ','VI').str.replace('Ⅶ','VII').str.replace('Ⅷ','VIII').str.replace('Ⅸ','IX').str.replace('Ⅹ','X')
@@ -384,10 +372,9 @@ PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_ti
 PW_table_array_clensing['clensing_title'] = PW_table_array_clensing['clensing_title'].str.replace('‐','').str.replace('｢','').str.replace('｣','').str.replace('〜','').str.replace('【','').str.replace('】','').str.replace('☆','').str.replace('†','').str.replace('…','')
 PW_table_array_clensing['site'] = 0
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-
 logging.info('==================marge : table_array=================')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 output_dai_to_csv = pd.DataFrame(columns=['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付'])
 table_array_outer = pd.merge(PW_table_array_clensing, DM_table_array_clensing, on=['clensing_title', 'rate', 'state_cd'], how='outer')
@@ -403,10 +390,6 @@ table_array_outer['num_y'] = table_array_outer['num_y'].fillna(0)
 table_array_outer['num_x'] = table_array_outer['num_x'].astype('int64')
 table_array_outer['num_y'] = table_array_outer['num_y'].astype('int64')
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-logging.info('============================3==========================')
-
 table_array_outer['p_title_x'] = table_array_outer['p_title_x'].fillna('')
 table_array_outer['p_title_y'] = table_array_outer['p_title_y'].fillna('')
 table_array_outer['pw_t_code'] = table_array_outer['pw_t_code'].fillna('')
@@ -416,19 +399,12 @@ table_array_outer['co_date_y'] = table_array_outer['co_date_y'].fillna('')
 table_array_outer['p_code_x'] = table_array_outer['p_code_x'].fillna('')
 table_array_outer['p_code_y'] = table_array_outer['p_code_y'].fillna('')
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-logging.info('============================4==========================')
-
 table_array_outer['dmm_t_code'] = table_array_outer['dmm_t_code'].where((table_array_outer['dmm_t_code'] == ''), ('dmm_' + table_array_outer['dmm_t_code']))
 table_array_outer['num_x'] = table_array_outer['num_y'].where((table_array_outer['num_x'] == 0) & (table_array_outer['num_y'] != 0 ), table_array_outer['num_x'])
 table_array_outer['p_title_y'] = table_array_outer['p_title_x'].where((table_array_outer['p_title_y'] == '' ) & (table_array_outer['p_title_x'] != ''), table_array_outer['p_title_y'])
 table_array_outer['pw_t_code'] = table_array_outer['dmm_t_code'].where((table_array_outer['pw_t_code'] == '') & (table_array_outer['dmm_t_code'] != ''), table_array_outer['pw_t_code'])
 table_array_outer['co_date_x'] = table_array_outer['co_date_y'].where((table_array_outer['co_date_x'] == '' ) & (table_array_outer['co_date_y'] != ''), table_array_outer['co_date_x'])
-
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-logging.info('============================5==========================')
+#table_array_outer['p_code_x'] =  table_array_outer['p_code_y'].where((table_array_outer['p_code_x'] == '' ) & (table_array_outer['p_code_y'] != ''), table_array_outer['p_code_x'])
 
 output_dai_to_csv['state_cd'] = table_array_outer['state_cd']
 output_dai_to_csv['t_code'] = table_array_outer['pw_t_code']
@@ -439,13 +415,12 @@ output_dai_to_csv['設置台数'] = table_array_outer['num_x']
 output_dai_to_csv['貸玉量'] = table_array_outer['rate']
 output_dai_to_csv['更新日付'] = table_array_outer['co_date_x']
 output_dai_to_csv = output_dai_to_csv.loc[:, ['state_cd', 't_code', 'pcode', '正式機種名', '機種名(店舗入力名)', '設置台数', '貸玉量', '更新日付']]
-output_dai_to_csv = output_dai_to_csv.drop_duplicates(subset=['t_code', 'pcode', '貸玉量'])
-
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
+output_dai_to_csv = output_dai_to_csv.drop_duplicates(subset=['t_code','pcode','貸玉量'])
 
 logging.info('=======================店舗データ=======================')
 logging.info('================clensing : DM_store_array=============')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 DM_store_array_clensing = DM_store_array.copy()
 DM_store_array_clensing['clensing_title'] = ''
@@ -479,10 +454,9 @@ DM_store_array_clensing['dai_s'] = DM_store_array_clensing['dai_sprit'].apply(sp
 DM_store_array_clensing['dai_sum'] = DM_store_array_clensing['dai_sprit'].apply(sprit_dai_sum)
 DM_store_array_clensing['site'] = 1
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
-
 logging.info('================clensing : PW_store_array=============')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 PW_store_array_clensing = PW_store_array.copy()
 PW_store_array_clensing['clensing_title'] = ''
@@ -510,10 +484,10 @@ PW_store_array_clensing['dai_sum'] = PW_store_array_clensing['dai_sprit'].apply(
 PW_store_array_clensing['co_date'] = date
 PW_store_array_clensing['site'] = 0
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
 
 logging.info('===================check: Store_list==================')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 store_pair_array = store_pair_array.rename(columns={'t_code':'pw_t_code'})
 store_pair_array['dmm_t_code'] = 'dmm_' + store_pair_array['dmm_t_code']
@@ -525,10 +499,10 @@ DM_store_array_merge_drop_PW['t_code'] = DM_store_array_merge_drop_PW['pw_t_code
 PW_store_array_merge = pd.merge(PW_store_array_clensing, store_pair_array, on=['state_cd','pw_t_code'], how='inner')
 PW_store_array_merge_drop_DM = PW_store_array_merge.dropna(subset=['dmm_t_code_y'])
 
-mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
 
 logging.info('===============duplicate : output_tenpo===============')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 output_tenpo_pp = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
 output_tenpo_pp['state_cd'] = PW_store_array_merge_drop_DM['state_cd']
@@ -706,7 +680,7 @@ output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'ホール名_
 output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'address_y' : 'address'})
 output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'access_y' : 'access'})
 output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'state_cd_y' : 'state_cd'})
-output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'pw_t_code' : 't_code'})
+output_tenpo_pc_drop_DM['t_code'] = output_tenpo_pc_drop_DM['dmm_t_code']
 output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'closeday_y' : 'closeday'})
 output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'opentime_y' : 'opentime'})
 output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'service_y' : 'service'})
@@ -722,16 +696,28 @@ output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'tenpo_update_
 output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'merge_url_y' : 'merge_url'})
 output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'tel_y' : 'tel'})
 output_tenpo_pc_drop_DM = output_tenpo_pc_drop_DM.rename(columns={'co_date_y' : 'co_date'})
-output_tenpo_pc_drop_DM['pw_t_code'] = output_tenpo_pc_drop_DM['t_code']
+output_tenpo_pc_drop_DM['pw_t_code'] = ''
 
 output_tenpo_to_csv = pd.concat([output_tenpo_pc_drop_PW ,output_tenpo_pc_drop_DM, output_tenpo_match, output_tenpo_p, output_tenpo_d],sort=True)
 
 output_tenpo_to_csv = output_tenpo_to_csv.loc[:, ['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code']]
 
+logging.info('=============duplicate : OUTPUT_DUPLICATE=============')
 mem = psutil.virtual_memory()
-logging.info('Used_memory:' + str(mem.used))
+print(mem.used)
+
+PW_code = output_tenpo_to_csv[output_tenpo_to_csv.duplicated(subset=['t_code','state_cd'],keep=False)]
+PW_code = PW_code.sort_values('pw_t_code')
+DM_code = output_tenpo_to_csv[output_tenpo_to_csv.duplicated(subset=['dmm_t_code','state_cd'],keep=False)]
+DM_code = DM_code.sort_values('dmm_t_code')
+name = output_tenpo_to_csv[output_tenpo_to_csv.duplicated(subset='ホール名',keep=False)]
+name = name.sort_values('ホール名')
+address = output_tenpo_to_csv[output_tenpo_to_csv.duplicated(subset='address',keep=False)]
+address = address.sort_values('address')
 
 logging.info('==========duplicate : Output_Tenpo_Not_Match==========')
+mem = psutil.virtual_memory()
+print(mem.used)
 
 output_tenpo_not_match_PW = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
 output_tenpo_not_match_DM = pd.DataFrame(columns=['総務省コード', 'state_cd', 't_code', 'ホール名', 'sv_level', 'sv_mail', 'sv_bbs', 'sv_ssc', 'sv_dedama', 'address', 'access', 'closeday', 'opentime', 'service', 'rate', 'dai', 'dai_p', 'dai_s', 'dai_sum', 'parking', 'tel', 'url', 'tenpo_update', 'co_date', 'merge_url', 'pw_t_code', 'dmm_t_code'])
